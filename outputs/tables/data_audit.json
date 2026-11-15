@@ -139,6 +139,19 @@
     "World excl. China and South Korea",
     "World excl. China, South Korea, Japan and Singapore"
   ],
+  "локации_без_данных_о_случаях": [
+    "Cote d'Ivoire",
+    "Western Sahara",
+    "Hong Kong",
+    "Macao",
+    "Transnistria",
+    "Taiwan"
+  ],
+  "локаций_прекративших_отчётность_более_года_назад": 4,
+  "несогласованность_total_cases_и_new_cases": {
+    "строк_проверено": 254409,
+    "расхождений": 0
+  },
   "дней_на_локацию_мин": 1,
   "дней_на_локацию_макс": 2483,
   "локаций_с_неполным_рядом": 81

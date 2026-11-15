@@ -17,17 +17,24 @@ README репозитория (public/data/README.md): «Our GitHub datasets are
 `female_smokers`, `male_smokers`, `tests_units`; `human_development_index` присутствует, но полностью пустой.
 
 ## Структура
-- 262 локации: 239 стран с заполненным `continent` + агрегаты OWID (World, Africa, Asia, Europe, European Union (27),
-  North America, Oceania, South America) + территории без кода (Kosovo, Transnistria → `code` = NaN, доля NaN в `code` 4,2 %).
+- 262 локации: 239 стран с заполненным `continent` (в том числе Kosovo = OWID_KOS и Transnistria = OWID_TRS, у них континент Europe)
+  + 8 агрегатов OWID с кодами (World, Africa, Asia, Europe, European Union (27), North America, Oceania, South America)
+  + 15 сущностей без кода и континента (доля NaN в `code` 4,2 %): England, Scotland, Wales, Northern Ireland, England and Wales,
+  High-/Low-/Lower-middle-/Upper-middle-income countries, Summer Olympics 2020, Winter Olympics 2022, «World excl. China» (3 варианта),
+  «Asia excl. China». У всех 15 нет населения; они удаляются при очистке.
 - Ключ (country, date) уникален, дубликатов нет. Отрицательных `new_cases`/`new_deaths`/`new_vaccinations` нет.
 - Континенты: Asia, Europe, Africa, Oceania, North America, South America.
 - Строк по годам: 2020 — 93 636, 2021 — 94 027, 2022 — 94 574, 2023 — 92 927, 2024 — 91 360, 2025 — 90 885, 2026 — 72 459.
 
 ## Важные особенности (влияют на методы)
 1. **Недельная отчётность.** С 2023 г. (источник — WHO) случаи публикуются раз в неделю: ненулевое `new_cases`
-   приходится на понедельник, остальные дни = 0 (Казахстан: ненулевых дней 2023 — 134, 2024 — 20, 2025–2026 — 0,
-   хотя `total_cases` растёт). Доля нулей в `new_cases` — 65,5 %, в `new_deaths` — 77,8 %.
-   ⇒ Базовая частота анализа — **неделя** (`resample('W').sum()`), для дневных графиков — `new_cases_smoothed`.
+   приходится на понедельник, остальные дни = 0 (Казахстан: ненулевых дней 2023 — 134, 2024 — 20, 2025–2026 — 0;
+   `total_cases` Казахстана не меняется с 2024-05-13 — это настоящие нули). Доля нулей в `new_cases` — 65,5 %,
+   в `new_deaths` — 77,8 %. ⇒ Базовая частота анализа — **неделя** (`resample('W').sum()`), для дневных графиков — `new_cases_smoothed`.
+   Проверено: недельная сумма `new_cases` совпадает с 7 × `new_cases_smoothed` на воскресенье (корреляция 1,0).
+1a. **Пропуски ≠ нули.** `new_cases` = NaN (10 896 строк) стоит до первого отчёта страны и после того, как страна
+   перестала отчитываться (Германия — с 2023-07-10, США — с 2023-05-21). Такие пропуски нельзя заменять нулями:
+   это «нет отчёта», а не «нет случаев». Недели без отчётов остаются NaN (`days_reported` = 0).
 2. **Вакцинация** заканчивается в 2023–2024 гг. (Казахстан: 2021-01-31 … 2023-04-30, макс. полностью вакцинированных 53 %;
    Германия до 2023-12-23, 75,6 %; США до 2023-05-09, 67,5 %; World до 2024-08-12, 65,1 %).
 3. **Сильная разреженность**: госпитализации есть у ~47 тыс. строк (6,5 %), тесты — 106 тыс. (16,8 %),

@@ -10,6 +10,7 @@ COVID-19 Global Dynamics — главный файл проекта.
 поэтому шаги можно запускать по отдельности и в разные дни.
 """
 import argparse
+import platform
 import sys
 from datetime import datetime
 
@@ -67,10 +68,19 @@ def step_load_data():
     """Шаг 1. Скачивание, чтение CSV чанками, оптимизация типов, Parquet, аудит и очистка."""
     log("ШАГ 1. Загрузка и подготовка данных")
     ensure_dirs()
-    data_loader.download_dataset()
+    try:
+        data_loader.download_dataset()
+    except ConnectionError as error:
+        # нет интернета (например, на защите): работаем с сохранённым снимком очищенных данных
+        if config.CLEAN_PARQUET.exists():
+            log(f"{error}. Использую сохранённый снимок {config.CLEAN_PARQUET.name}")
+            STATE["df"] = data_loader.load_parquet(config.CLEAN_PARQUET)
+            STATE.pop("weekly", None)
+            return
+        raise
     df_raw, load_stats = data_loader.read_csv_in_chunks()
     data_loader.save_parquet(df_raw, config.RAW_PARQUET)
-    format_rows = data_loader.compare_csv_parquet()
+    format_rows = data_loader.compare_read_methods()
     save_table(pd.DataFrame(format_rows), "format_comparison")
 
     clean_df, audit_report, steps = cleaning.run_audit_and_clean(df_raw)
@@ -113,19 +123,35 @@ def step_timeseries_and_waves():
     }).loc["2021-07-01":"2021-08-31"]
     save_table(rolling.reset_index(), "rolling_mean_kazakhstan")
 
-    # сезонная декомпозиция мирового недельного ряда
-    world = timeseries.weekly_series(weekly, "World", "new_cases_per_million")
-    decomposition = timeseries.decompose_series(world)
-    strength = timeseries.seasonality_strength(decomposition)
-    visualization.plot_decomposition(decomposition, "Сезонная декомпозиция недельных случаев на млн (World)")
+    # сезонная декомпозиция 1: дневной ряд США с ежедневной отчётностью, период 7 дней —
+    # эффект дня недели объясняет, почему базовая частота анализа — неделя
+    daily_us = timeseries.country_series(df, "United States", "new_cases").loc["2020-03-01":"2022-12-31"]
+    weekly_decomposition = timeseries.decompose_series(daily_us.fillna(0), period=7)
+    weekday = timeseries.weekday_effect(weekly_decomposition)
+    visualization.plot_decomposition(weekly_decomposition, "Декомпозиция дневных случаев, США, 2020-03 … 2022-12",
+                                     period_label="период 7 дней", name="seasonal_decomposition_us_daily")
+    visualization.plot_weekday_effect(weekday, "США")
+
+    # сезонная декомпозиция 2: недельный мировой ряд, мультипликативная модель, период 52 недели
+    world = timeseries.weekly_series(weekly, "World", "new_cases_per_million").loc["2020-03-01":"2023-12-31"]
+    yearly_decomposition = timeseries.decompose_series(world, period=52, model="multiplicative")
+    strength = timeseries.seasonality_strength(yearly_decomposition)
+    visualization.plot_decomposition(yearly_decomposition,
+                                     "Мультипликативная декомпозиция недельных случаев на млн (World, 2020-03 … 2023-12)",
+                                     period_label="период 52 недели", name="seasonal_decomposition_world")
 
     # волны двумя методами
     waves_threshold, seconds_threshold = waves.detect_waves_for_all(weekly, "threshold")
     waves_peaks, seconds_peaks = waves.detect_waves_for_all(weekly, "peaks")
-    comparison, agreement = waves.compare_methods(waves_threshold, waves_peaks, seconds_threshold, seconds_peaks)
+    coverage = waves.check_wave_coverage(waves_peaks, weekly)          # проверка: волны не пересекаются
+    comparison, matching = waves.compare_methods(waves_threshold, waves_peaks, seconds_threshold, seconds_peaks)
+    sensitivity = waves.sensitivity_table(weekly, ["Kazakhstan", "Germany", "United States", "India", "South Africa"])
     save_table(waves_threshold, "waves_threshold")
     save_table(waves_peaks, "waves_peaks")
     save_table(comparison, "wave_methods_comparison")
+    save_table(matching, "wave_methods_peak_matching")
+    save_table(sensitivity, "wave_sensitivity")
+    save_table(coverage, "wave_coverage_check")
     STATE["waves"] = {"threshold": waves_threshold, "peaks": waves_peaks}
 
     visualization.plot_waves_small_multiples(weekly, waves_peaks,
@@ -134,9 +160,11 @@ def step_timeseries_and_waves():
 
     kazakhstan_waves = waves_peaks[waves_peaks["location"] == "Kazakhstan"]
     update_results("3_ряды_и_волны", {
-        "сила_сезонности_world": strength,
+        "эффект_дня_недели_сша_%": weekday,
+        "сила_годовой_сезонности_world": strength,
         "сравнение_методов": comparison.to_dict(orient="records"),
-        "совпадение_пиков_%": agreement,
+        "чувствительность_к_prominence": sensitivity.to_dict(orient="records"),
+        "доля_случаев_в_волнах_макс": float(coverage["share_in_waves"].max()),
         "волны_казахстан": kazakhstan_waves[["wave_no", "start_date", "peak_date", "end_date",
                                               "peak_weekly_cases_per_million", "cfr_pct", "size"]].to_dict(orient="records"),
     })
@@ -154,6 +182,7 @@ def step_forecast():
     save_table(metrics, "forecast_metrics")
     save_table(summary, "forecast_summary")
     save_table(forecasts, "forecast_predictions")
+    save_table(forecasting.mae_by_year(forecasts), "forecast_mae_by_year")
     STATE["forecast_metrics"] = metrics
     visualization.plot_forecast(forecasts, metrics, "Kazakhstan")
     update_results("4_прогноз", {"период_оценки": [config.FORECAST_START, config.FORECAST_END],
@@ -219,15 +248,35 @@ def step_dashboard():
     run_dashboard()
 
 
+def environment_info():
+    """Версии библиотек и описание среды — чтобы числа отчёта можно было привязать к конкретному прогону."""
+    import dash
+    import numpy
+    import plotly
+    import sklearn
+    import statsmodels
+    return {
+        "python": platform.python_version(),
+        "платформа": platform.platform(),
+        "pandas": pd.__version__, "numpy": numpy.__version__, "plotly": plotly.__version__,
+        "dash": dash.__version__, "scikit-learn": sklearn.__version__, "statsmodels": statsmodels.__version__,
+        "файл_данных": config.RAW_CSV.name,
+        "md5_файла": data_loader.file_md5(config.RAW_CSV) if config.RAW_CSV.exists() else None,
+    }
+
+
 def run_all():
     """Шаг 7. Все шаги анализа подряд с замером времени каждого."""
     timings = {}
-    for number, (name, step) in enumerate(PIPELINE_STEPS.items(), start=1):
-        with Timer() as timer:
-            step()
-        timings[f"{number}. {name}"] = timer.seconds
-        log(f"--- шаг {number} выполнен за {timer.seconds} с ---")
+    with Timer() as total:
+        for number, (name, step) in enumerate(PIPELINE_STEPS.items(), start=1):
+            with Timer() as timer:
+                step()
+            timings[f"{number}. {name}"] = timer.seconds
+            log(f"--- шаг {number} выполнен за {timer.seconds} с ---")
+    timings["всего"] = total.seconds
     update_results("время_шагов_с", timings)
+    update_results("среда", environment_info())
     log(f"Готово. Итоги в {config.RESULTS_JSON}, таблицы в {config.TABLES_DIR}, графики в {config.FIGURES_DIR}")
     return timings
 
@@ -279,7 +328,11 @@ def run_menu():
         print()
         for key, (title, _) in MENU.items():
             print(f"  {key} — {title}")
-        choice = input("Выберите пункт: ").strip()
+        try:
+            choice = input("Выберите пункт: ").strip()
+        except (EOFError, KeyboardInterrupt):       # Ctrl+D / Ctrl+C — выходим без трассировки
+            print("\nВыход.")
+            break
 
         if choice == "0":
             print("До свидания!")

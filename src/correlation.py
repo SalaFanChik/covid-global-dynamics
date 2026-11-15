@@ -5,6 +5,7 @@
 Единица анализа — страна (одна строка на страну из eda.country_summary),
 агрегаты OWID исключены, микрогосударства отфильтрованы по населению.
 """
+import numpy as np
 import pandas as pd
 
 import config
@@ -25,6 +26,8 @@ CORRELATION_COLUMNS = {
     "population_density": "плотность населения",
     "extreme_poverty": "крайняя бедность, %",
     "max_stringency_index": "макс. строгость мер",
+    "total_tests_per_thousand": "тестов на 1000 (полнота учёта)",
+    "excess_mortality_cumulative_per_million": "избыточная смертность на млн",
 }
 
 
@@ -52,13 +55,29 @@ def strongest_correlations(matrix, target="смертей на млн", top=6):
     return ordered.head(top)
 
 
+def partial_correlation(x, y, control):
+    """
+    Частная корреляция Спирмена x и y «при прочих равных» по control:
+    из x и y убираем линейную зависимость от control (остатки) и коррелируем остатки.
+    """
+    table = pd.DataFrame({"x": x, "y": y, "c": control}).dropna()
+    if len(table) < 10:
+        return None
+    residual_x = table["x"] - np.polyval(np.polyfit(table["c"], table["x"], 1), table["c"])
+    residual_y = table["y"] - np.polyval(np.polyfit(table["c"], table["y"], 1), table["c"])
+    return round(float(residual_x.corr(residual_y, method="spearman")), 3)
+
+
 def vaccination_vs_mortality(sql_vaccination_table):
     """
     Готовит данные «вакцинация к концу 2021 г. против смертности в 2022 г.» из SQL-запроса
-    vaccination_vs_deaths_2022 и считает корреляции (общую и с поправкой на возраст — по группам).
+    vaccination_vs_deaths_2022 и считает корреляции: общую, частную (с поправкой на медианный
+    возраст) и внутри возрастных групп. Это межстрановая (экологическая) связь, а не причинность.
     """
     table = sql_vaccination_table.dropna(subset=["fully_vaccinated_pct", "deaths_per_million_2022"]).copy()
+    table["fully_vaccinated_pct"] = table["fully_vaccinated_pct"].clip(upper=100)   # Гибралтар: 110 % (приезжие)
     overall = round(float(table["fully_vaccinated_pct"].corr(table["deaths_per_million_2022"], method="spearman")), 3)
+    partial = partial_correlation(table["fully_vaccinated_pct"], table["deaths_per_million_2022"], table["median_age"])
 
     # возраст — главный смешивающий фактор: богатые «старые» страны и привиты лучше, и теряют больше пожилых.
     # Поэтому смотрим связь внутри возрастных групп (if / elif / else).
@@ -80,7 +99,7 @@ def vaccination_vs_mortality(sql_vaccination_table):
                     "корреляция_спирмена": round(part["fully_vaccinated_pct"].corr(
                         part["deaths_per_million_2022"], method="spearman"), 3)}), include_groups=False)
                 .reset_index())
-    return table, overall, by_group
+    return table, overall, partial, by_group
 
 
 def run_correlation(summary, sql_vaccination_table=None):
@@ -98,10 +117,18 @@ def run_correlation(summary, sql_vaccination_table=None):
         ", ".join(f"{name}: {value}" for name, value in strongest.items()))
 
     if sql_vaccination_table is not None and len(sql_vaccination_table):
-        vac_table, overall, by_group = vaccination_vs_mortality(sql_vaccination_table)
+        vac_table, overall, partial, by_group = vaccination_vs_mortality(sql_vaccination_table)
         save_table(by_group, "vaccination_vs_deaths_by_age_group")
         results["вакцинация_vs_смертность_2022_общая"] = overall
+        results["вакцинация_vs_смертность_2022_частная_при_контроле_возраста"] = partial
         results["вакцинация_vs_смертность_2022_по_возрасту"] = by_group.to_dict(orient="records")
-        log(f"Вакцинация vs смертность 2022: общая корреляция {overall}; по возрастным группам: "
+        log(f"Вакцинация vs смертность 2022: общая {overall}, частная (возраст) {partial}; по группам: "
             + "; ".join(f"{row.age_group}: {row.корреляция_спирмена}" for row in by_group.itertuples()))
+    # избыточная смертность — более честная мера потерь, чем официальная статистика
+    excess = table.dropna(subset=["people_fully_vaccinated_per_hundred", "excess_mortality_cumulative_per_million"])
+    if len(excess) >= 10:
+        results["вакцинация_vs_избыточная_смертность"] = {
+            "стран": int(len(excess)),
+            "спирмен": round(float(excess["people_fully_vaccinated_per_hundred"].corr(
+                excess["excess_mortality_cumulative_per_million"], method="spearman")), 3)}
     return results, matrix

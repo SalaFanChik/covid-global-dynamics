@@ -4,6 +4,7 @@
 """
 import json
 import time
+import tracemalloc
 from datetime import datetime
 from pathlib import Path
 
@@ -34,14 +35,36 @@ class Timer:
         self.seconds = round(time.perf_counter() - self.start, 3)
 
 
+class MemoryTimer(Timer):
+    """
+    Секундомер + пиковая память Python-объектов (tracemalloc из стандартной библиотеки).
+
+    Использование:
+        with MemoryTimer() as m:
+            df = pd.read_csv(...)
+        print(m.seconds, m.peak_mb)
+    """
+
+    def __enter__(self):
+        tracemalloc.start()
+        return super().__enter__()
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        super().__exit__(exc_type, exc_value, traceback)
+        _, peak = tracemalloc.get_traced_memory()
+        tracemalloc.stop()
+        self.peak_mb = round(peak / 1_000_000, 1)
+
+
+# Везде в проекте мегабайт = 10^6 байт (как в проводнике и в документации OWID)
 def memory_mb(df):
     """Сколько мегабайт занимает DataFrame в памяти (с учётом строк)."""
-    return round(float(df.memory_usage(deep=True).sum()) / 1024 ** 2, 1)
+    return round(float(df.memory_usage(deep=True).sum()) / 1_000_000, 1)
 
 
 def file_size_mb(path):
     """Размер файла на диске в мегабайтах."""
-    return round(Path(path).stat().st_size / 1024 ** 2, 1)
+    return round(Path(path).stat().st_size / 1_000_000, 1)
 
 
 def ensure_dirs():

@@ -16,6 +16,7 @@ import numpy as np
 import pandas as pd
 
 import config
+from src.cleaning import location_coverage
 from src.sql_queries import QUERIES, WEEKLY_FROM_DAILY_SQL
 from src.utils import Timer, log, save_table
 
@@ -49,7 +50,10 @@ CREATE TABLE locations (
     extreme_poverty            REAL,
     diabetes_prevalence        REAL,
     handwashing_facilities     REAL,
-    hospital_beds_per_thousand REAL
+    hospital_beds_per_thousand REAL,
+    first_report_date          TEXT,
+    last_report_date           TEXT,
+    n_days_reported            INTEGER
 );
 
 CREATE TABLE daily_stats (
@@ -159,6 +163,7 @@ CREATE TABLE forecast_results (
 CREATE INDEX idx_daily_date ON daily_stats(date);
 CREATE INDEX idx_weekly_week ON weekly_stats(week_start);
 CREATE INDEX idx_waves_iso ON waves(iso_code);
+CREATE INDEX idx_locations_continent ON locations(continent_id);
 """
 
 # Какие столбцы исходных данных идут в какую таблицу фактов
@@ -190,12 +195,14 @@ LOCATION_COLUMNS = [
 ]
 
 
-def connect(db_path=config.DB_PATH):
-    """Открывает соединение с базой. Если файла нет — понятная ошибка."""
+def connect(db_path=config.DB_PATH, must_exist=True):
+    """Открывает соединение с базой и включает проверку внешних ключей (в SQLite она выключена по умолчанию)."""
     db_path = Path(db_path)
-    if not db_path.exists():
+    if must_exist and not db_path.exists():
         raise FileNotFoundError(f"База {db_path} ещё не создана. Выполните пункт меню «База данных и SQL».")
-    return sqlite3.connect(db_path)
+    connection = sqlite3.connect(db_path)
+    connection.execute("PRAGMA foreign_keys = ON")
+    return connection
 
 
 def create_schema(connection):
@@ -212,6 +219,7 @@ def load_reference_tables(df, connection):
                            [(number, name) for name, number in continent_ids.items()])
 
     first_rows = df.groupby("iso_code", observed=True).first()
+    coverage = location_coverage(df).set_index("iso_code")      # первый/последний отчёт о случаях
     rows = []
     for iso_code, row in first_rows.iterrows():
         continent = row["continent"]
@@ -220,8 +228,12 @@ def load_reference_tables(df, connection):
         for column in LOCATION_COLUMNS:
             value = row[column]
             values.append(None if pd.isna(value) else float(value))
+        cover = coverage.loc[str(iso_code)]
+        values += [str(cover["first_report_date"].date()) if pd.notna(cover["first_report_date"]) else None,
+                   str(cover["last_report_date"].date()) if pd.notna(cover["last_report_date"]) else None,
+                   int(cover["n_days_reported"])]
         rows.append(values)
-    placeholders = ", ".join(["?"] * (4 + len(LOCATION_COLUMNS)))
+    placeholders = ", ".join(["?"] * (7 + len(LOCATION_COLUMNS)))
     connection.executemany(f"INSERT INTO locations VALUES ({placeholders})", rows)
     connection.commit()
     return continent_ids
@@ -287,7 +299,7 @@ def build_database(df, waves, forecast_metrics, db_path=config.DB_PATH):
     db_path = Path(db_path)
     if db_path.exists():
         db_path.unlink()
-    connection = sqlite3.connect(db_path)
+    connection = connect(db_path, must_exist=False)
     try:
         with Timer() as timer:
             create_schema(connection)
@@ -325,33 +337,46 @@ def run_queries(connection, queries=QUERIES):
     return results, pd.DataFrame(summary)
 
 
-def compare_pandas_vs_sql(df, connection):
+def compare_pandas_vs_sql(df, connection, repeats=3):
     """
     Один и тот же расчёт двумя способами: недельные суммы случаев и смертей по всем локациям
-    из дневных данных. Сравниваем время и проверяем, что результаты совпадают.
-    """
-    with Timer() as timer_sql:
-        sql_result = pd.read_sql_query(WEEKLY_FROM_DAILY_SQL, connection)
+    из дневных данных (603 684 строки -> 86 407 недель).
 
-    with Timer() as timer_pandas:
-        pandas_result = (
-            df.assign(week_start=df["date"] - pd.to_timedelta(df["date"].dt.weekday, unit="D"))
-              .groupby(["iso_code", "week_start"], observed=True)[["new_cases", "new_deaths"]]
-              .sum()
-              .reset_index()
-        )
+    Что входит в замер: SQL — выполнение GROUP BY в SQLite и выгрузка результата в DataFrame;
+    pandas — groupby по уже загруженному в память DataFrame. Берём медиану из repeats запусков
+    и проверяем, что результаты совпадают (суммы сравниваем в float64 с допуском).
+    """
+    sql_times, pandas_times = [], []
+    for _ in range(repeats):
+        with Timer() as timer_sql:
+            sql_result = pd.read_sql_query(WEEKLY_FROM_DAILY_SQL, connection)
+        sql_times.append(timer_sql.seconds)
+
+        with Timer() as timer_pandas:
+            pandas_result = (
+                df.assign(week_start=df["date"] - pd.to_timedelta(df["date"].dt.day_of_week, unit="D"))
+                  .groupby(["iso_code", "week_start"], observed=True)[["new_cases", "new_deaths"]]
+                  .sum(min_count=1)
+                  .reset_index()
+            )
+        pandas_times.append(timer_pandas.seconds)
 
     # приводим ключи к одному виду и сравниваем суммы
     pandas_result["iso_code"] = pandas_result["iso_code"].astype(str)
     pandas_result["week_start"] = pandas_result["week_start"].dt.strftime("%Y-%m-%d")
     merged = sql_result.merge(pandas_result, on=["iso_code", "week_start"], suffixes=("_sql", "_pandas"))
     same_rows = len(merged) == len(sql_result) == len(pandas_result)
-    max_diff = float(np.abs(merged["new_cases_sql"] - merged["new_cases_pandas"]).max())
-    equal = bool(same_rows and max_diff < 1e-6)
+    difference = (merged["new_cases_sql"].astype("float64") - merged["new_cases_pandas"].astype("float64")).abs()
+    max_diff = float(difference.max()) if same_rows else None
+    equal = bool(same_rows and max_diff is not None and max_diff < 1e-6)
 
     comparison = pd.DataFrame([
-        {"подход": "SQL (SQLite GROUP BY)", "строк": len(sql_result), "время_с": timer_sql.seconds},
-        {"подход": "Pandas (groupby)", "строк": len(pandas_result), "время_с": timer_pandas.seconds},
+        {"подход": "SQL (SQLite GROUP BY + выгрузка в pandas)", "строк": len(sql_result),
+         "время_с_медиана": float(np.median(sql_times))},
+        {"подход": "pandas (groupby в памяти)", "строк": len(pandas_result),
+         "время_с_медиана": float(np.median(pandas_times))},
     ])
-    log(f"Pandas vs SQL: {timer_pandas.seconds} с против {timer_sql.seconds} с, результаты совпадают: {equal}")
-    return comparison, {"результаты_совпадают": equal, "макс_расхождение": max_diff}
+    log(f"Pandas vs SQL: {comparison.iloc[1, 2]} с против {comparison.iloc[0, 2]} с, результаты совпадают: {equal}")
+    return comparison, {"результаты_совпадают": equal, "макс_расхождение": max_diff,
+                        "вывод": "pandas быстрее для расчётов в памяти; SQLite хранит данные между запусками, "
+                                 "фильтрует их запросами и обслуживает дашборд без загрузки всего файла"}

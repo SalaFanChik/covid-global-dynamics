@@ -74,16 +74,18 @@ def rolling_origin_evaluation(series, start=config.FORECAST_START, end=config.FO
     Оценивает все модели на одном ряду. Возвращает (таблица метрик, таблица прогнозов).
     """
     series = series.sort_index().astype(float)
+    series = series.loc[series.first_valid_index():]           # начинаем с первого отчёта страны
+    filled = series.ffill()                                     # редкие пропуски внутри истории — последним значением
     positions = np.where((series.index >= pd.Timestamp(start)) & (series.index <= pd.Timestamp(end)))[0]
     metrics, forecasts = [], []
     for name, model in models.items():
         errors = {h: [] for h in horizons}
         with Timer() as timer:
             for t in positions:
-                history = series.iloc[: t + 1]              # данные только до момента t
+                history = filled.iloc[: t + 1]              # данные только до момента t
                 for h in horizons:
-                    if t + h >= len(series):
-                        continue
+                    if t + h >= len(series) or pd.isna(series.iloc[t + h]):
+                        continue                            # нет факта — нечего оценивать
                     actual = float(series.iloc[t + h])
                     predicted = model(history, h)
                     errors[h].append(abs(actual - predicted))
@@ -131,6 +133,15 @@ def summarize_models(metrics):
     win_counts = best.groupby(["model", "horizon_weeks"]).size()
     summary["wins"] = [int(win_counts.get((row.model, row.horizon_weeks), 0)) for row in summary.itertuples()]
     return summary.round(3)
+
+
+def mae_by_year(forecasts):
+    """MAE по годам целевой недели: показывает, что ошибка определяется годом Омикрона (2022)."""
+    table = forecasts.copy()
+    table["year"] = pd.to_datetime(table["target_week"]).dt.year
+    table["abs_error"] = (table["actual"] - table["forecast"]).abs()
+    return (table.groupby(["location", "model", "horizon_weeks", "year"])["abs_error"]
+            .mean().round(1).reset_index().rename(columns={"abs_error": "mae"}))
 
 
 def conclusion(summary):

@@ -10,7 +10,7 @@ import pandas as pd
 import config
 from src.utils import log, save_json
 
-# Столбцы, в которых пропуск означает «данных за этот день не было» -> заполняем нулём
+# Счётчики новых случаев и смертей: пропуск означает «отчёта за этот день не было»
 COUNT_COLUMNS = ["new_cases", "new_deaths"]
 
 
@@ -47,6 +47,17 @@ def audit_quality(df):
     report["локации_без_континента"] = sorted(df.loc[df["continent"].isna(), "location"].unique().tolist())
     report["локации_без_населения"] = sorted(df.loc[df["population"].isna(), "location"].unique().tolist())
 
+    # покрытие отчётностью: когда каждая локация сообщала о случаях в первый и последний раз
+    coverage = location_coverage(df)
+    report["локации_без_данных_о_случаях"] = coverage.loc[coverage["n_days_reported"] == 0, "location"].tolist()
+    last_date = df["date"].max()
+    early_stop = coverage[(coverage["n_days_reported"] > 0) &
+                          (coverage["last_report_date"] < last_date - pd.Timedelta(days=365))]
+    report["локаций_прекративших_отчётность_более_года_назад"] = int(len(early_stop))
+
+    # согласованность накопленных и новых случаев: total_cases.diff() должен совпадать с new_cases
+    report["несогласованность_total_cases_и_new_cases"] = total_vs_new_mismatch(df)
+
     # полнота дат по локациям: сколько дней есть у каждой
     days_per_location = df.groupby("location", observed=True)["date"].agg(["min", "max", "count"])
     report["дней_на_локацию_мин"] = int(days_per_location["count"].min())
@@ -60,6 +71,38 @@ def audit_quality(df):
     return report
 
 
+def location_coverage(df):
+    """
+    По каждой локации: дата первого и последнего отчёта о случаях и число дней с данными.
+    NaN в new_cases означает «отчёта не было» (до первого случая или после прекращения отчётности).
+    """
+    reported = df[df["new_cases"].notna()]
+    first_last = reported.groupby("iso_code", observed=True)["date"].agg(["min", "max", "count"])
+    names = df.groupby("iso_code", observed=True)["location"].first()
+    coverage = pd.DataFrame({"location": names})
+    coverage["first_report_date"] = first_last["min"]          # NaT, если отчётов не было вовсе
+    coverage["last_report_date"] = first_last["max"]
+    coverage["n_days_reported"] = first_last["count"]           # выравнивается по iso_code, пропуски -> 0
+    coverage["n_days_reported"] = coverage["n_days_reported"].fillna(0).astype(int)
+    coverage = coverage.reset_index()
+    coverage["location"] = coverage["location"].astype(str)
+    coverage["iso_code"] = coverage["iso_code"].astype(str)
+    return coverage
+
+
+def total_vs_new_mismatch(df, start="2020-01-01", end="2022-12-31"):
+    """
+    Сколько строк, где прирост накопленных случаев не совпадает с new_cases (на дневной отчётности
+    2020–2022). Небольшое число расхождений — ретроспективные правки статистики, а не ошибка загрузки.
+    """
+    part = df[(df["date"] >= start) & (df["date"] <= end) & df["continent"].notna()]
+    part = part.sort_values(["iso_code", "date"])
+    diff = part.groupby("iso_code", observed=True)["total_cases"].diff()
+    both = diff.notna() & part["new_cases"].notna()
+    mismatch = (diff[both] - part.loc[both, "new_cases"]).abs() > 0.5
+    return {"строк_проверено": int(both.sum()), "расхождений": int(mismatch.sum())}
+
+
 def clean_data(df):
     """
     Очищает данные. Возвращает (очищенный DataFrame, журнал шагов).
@@ -70,10 +113,12 @@ def clean_data(df):
        удаляем — это не страны и не официальные агрегаты OWID;
     3. агрегаты OWID (World, континенты, ЕС) оставляем, но помечаем флагом is_aggregate,
        чтобы не смешивать их со странами в статистике;
-    4. пропуски в new_cases/new_deaths заполняем нулём: до первого случая и в дни без отчёта
-       новых случаев не было;
-    5. отрицательные значения (корректировки статистики) обрезаем до нуля;
-    6. сортируем по локации и дате, добавляем столбец year.
+    4. пропуски в new_cases/new_deaths НЕ заполняем нулями: NaN означает «отчёта не было»
+       (до первого случая или после того, как страна перестала отчитываться), а ноль —
+       «отчёт был, новых случаев нет». Подмена NaN нулями исказила бы прогноз и графики;
+    5. локации, у которых нет ни одного отчёта о случаях, удаляем;
+    6. отрицательные значения (корректировки статистики) обрезаем до нуля;
+    7. сортируем по локации и дате, добавляем столбец year.
     """
     steps = []
 
@@ -100,14 +145,21 @@ def clean_data(df):
     note("помечены агрегаты OWID (is_aggregate=True)", df["is_aggregate"].sum(),
          "World, континенты и ЕС нужны для графиков, но не должны попадать в статистику по странам")
 
-    # 4. пропуски в счётчиках -> 0
+    # 4. пропуски в счётчиках оставляем как есть (это информация, а не ошибка)
     for column in COUNT_COLUMNS:
-        missing = df[column].isna()
-        df[column] = df[column].fillna(0)
-        note(f"пропуски {column} заменены на 0", missing.sum(),
-             "пропуск стоит до первого отчёта или в день без отчёта, т. е. новых случаев не было")
+        note(f"пропуски {column} сохранены как NaN", df[column].isna().sum(),
+             "NaN = отчёта не было (до первого случая или после прекращения отчётности), 0 = случаев не было")
 
-    # 5. отрицательные значения -> 0
+    # 5. локации без единого отчёта о случаях
+    coverage = location_coverage(df)
+    no_data = coverage.loc[coverage["n_days_reported"] == 0, "iso_code"].tolist()
+    rows_no_data = df["iso_code"].isin(no_data)
+    df = df[~rows_no_data].copy()
+    note("удалены локации без данных о случаях", rows_no_data.sum(),
+         "ни одного отчёта о случаях (ВОЗ не публикует данные): " +
+         ", ".join(coverage.loc[coverage["iso_code"].isin(no_data), "location"]))
+
+    # 6. отрицательные значения -> 0
     for column in COUNT_COLUMNS:
         negative = df[column] < 0
         if negative.any():
@@ -115,7 +167,7 @@ def clean_data(df):
         note(f"отрицательные {column} обрезаны до 0", negative.sum(),
              "отрицательные значения — это задним числом исправленная статистика, а не реальные случаи")
 
-    # 6. порядок строк и вспомогательные столбцы
+    # 7. порядок строк и вспомогательные столбцы
     df = df.sort_values(["location", "date"]).reset_index(drop=True)
     df["year"] = df["date"].dt.year.astype("int16")
     # category после фильтрации хранит удалённые значения -> убираем лишние категории
@@ -137,6 +189,10 @@ def write_audit_txt(report, steps, path):
     lines.append(f"Доля нулей в new_cases: {report['доля_нулей_new_cases']:.1%} (недельная отчётность с 2023 г.)")
     lines.append(f"Полностью пустые столбцы: {report['полностью_пустые_столбцы']}")
     lines.append(f"Локации без ISO-кода: {report['локации_без_iso_code']}")
+    lines.append(f"Локации без данных о случаях: {report['локации_без_данных_о_случаях']}")
+    lines.append(f"Локаций, прекративших отчётность более года назад: "
+                 f"{report['локаций_прекративших_отчётность_более_года_назад']}")
+    lines.append(f"Проверка total_cases.diff() == new_cases (2020–2022): {report['несогласованность_total_cases_и_new_cases']}")
     lines.append("")
     lines.append("Шаги очистки:")
     for number, step in enumerate(steps, start=1):
@@ -153,5 +209,6 @@ def run_audit_and_clean(df):
     save_json(report, config.TABLES_DIR / "data_audit.json")
     save_json(steps, config.TABLES_DIR / "cleaning_log.json")
     write_audit_txt(report, steps, config.TABLES_DIR / "data_audit.txt")
+    location_coverage(clean_df).to_csv(config.TABLES_DIR / "location_coverage.csv", index=False)
     log(f"После очистки: {len(clean_df):,} строк, {clean_df['location'].nunique()} локаций")
     return clean_df, report, steps

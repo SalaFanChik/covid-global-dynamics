@@ -8,7 +8,7 @@
 
 QUERIES = {
     "top15_deaths_per_million": {
-        "описание": "Топ-15 стран по накопленной смертности на миллион жителей (последняя доступная дата)",
+        "описание": "Топ-15 стран (население ≥ 1 млн) по накопленной смертности на миллион жителей",
         "конструкции": ["JOIN 3 таблиц", "коррелированный подзапрос"],
         "sql": """
             SELECT l.location,
@@ -19,7 +19,7 @@ QUERIES = {
             FROM daily_stats d
             JOIN locations  l ON l.iso_code = d.iso_code
             JOIN continents c ON c.continent_id = l.continent_id
-            WHERE l.is_aggregate = 0
+            WHERE l.is_aggregate = 0 AND l.population >= 1000000
               AND d.date = (SELECT MAX(date) FROM daily_stats
                             WHERE iso_code = d.iso_code AND total_deaths_per_million IS NOT NULL)
             ORDER BY d.total_deaths_per_million DESC
@@ -132,7 +132,7 @@ QUERIES = {
         """,
     },
     "waves_per_country": {
-        "описание": "Число волн по странам и самая сильная волна каждой страны (ROW_NUMBER, COUNT OVER)",
+        "описание": "Число волн по странам (≥ 1 млн жителей) и самая сильная волна каждой (ROW_NUMBER, COUNT OVER)",
         "конструкции": ["CTE", "оконные функции ROW_NUMBER и COUNT ... OVER", "JOIN"],
         "sql": """
             WITH ranked AS (
@@ -148,7 +148,7 @@ QUERIES = {
             FROM ranked r
             JOIN locations  l ON l.iso_code = r.iso_code
             JOIN continents c ON c.continent_id = l.continent_id
-            WHERE r.rn = 1
+            WHERE r.rn = 1 AND l.population >= 1000000
             ORDER BY r.n_waves DESC, r.peak_weekly_cases_per_million DESC;
         """,
     },
@@ -165,7 +165,7 @@ QUERIES = {
             FROM waves w
             JOIN locations  l ON l.iso_code = w.iso_code
             JOIN continents c ON c.continent_id = l.continent_id
-            WHERE w.method = 'peaks'
+            WHERE w.method = 'peaks' AND l.population >= 1000000
             GROUP BY c.continent_name
             HAVING COUNT(DISTINCT w.iso_code) >= 10
             ORDER BY waves_per_country DESC;
@@ -180,20 +180,21 @@ QUERIES = {
                    ROUND(AVG(peak_weekly_cases_per_million), 0) AS avg_peak_per_million,
                    ROUND(AVG(cfr_pct), 2) AS avg_cfr_pct,
                    ROUND(AVG(duration_weeks), 1) AS avg_duration_weeks
-            FROM waves
-            WHERE method = 'peaks'
+            FROM waves w
+            JOIN locations l ON l.iso_code = w.iso_code
+            WHERE w.method = 'peaks' AND l.population >= 1000000
             GROUP BY peak_year
             ORDER BY peak_year;
         """,
     },
     "countries_above_world_peak": {
-        "описание": "Страны, чей пик недельной заболеваемости втрое выше мирового пика (скалярный подзапрос)",
+        "описание": "Страны (≥ 1 млн), чей пик недельной заболеваемости втрое выше мирового (скалярный подзапрос)",
         "конструкции": ["JOIN", "GROUP BY", "HAVING со скалярным подзапросом"],
         "sql": """
             SELECT l.location, ROUND(MAX(w.new_cases_per_million), 0) AS peak_weekly_per_million
             FROM weekly_stats w
             JOIN locations l ON l.iso_code = w.iso_code
-            WHERE l.is_aggregate = 0
+            WHERE l.is_aggregate = 0 AND l.population >= 1000000
             GROUP BY l.location
             HAVING MAX(w.new_cases_per_million) >
                    3 * (SELECT MAX(new_cases_per_million) FROM weekly_stats WHERE iso_code = 'OWID_WRL')
@@ -267,6 +268,66 @@ QUERIES = {
             )
             WHERE rnk = 1
             ORDER BY location, horizon_weeks;
+        """,
+    },
+    "vaccination_tiers": {
+        "описание": "Страны по уровню вакцинации (CASE WHEN): средняя смертность 2022 г. и возраст в каждой группе",
+        "конструкции": ["CASE WHEN", "CTE", "GROUP BY", "LEFT JOIN"],
+        "sql": """
+            WITH coverage AS (
+                SELECT iso_code, MAX(people_fully_vaccinated_per_hundred) AS fully_vaccinated_pct
+                FROM vaccinations WHERE date <= '2021-12-31' GROUP BY iso_code
+            ),
+            deaths_2022 AS (
+                SELECT iso_code, SUM(new_deaths_per_million) AS deaths_per_million_2022
+                FROM daily_stats WHERE date BETWEEN '2022-01-01' AND '2022-12-31' GROUP BY iso_code
+            )
+            SELECT CASE
+                       WHEN cov.fully_vaccinated_pct IS NULL THEN '0. нет данных'
+                       WHEN cov.fully_vaccinated_pct < 20 THEN '1. менее 20 %'
+                       WHEN cov.fully_vaccinated_pct < 50 THEN '2. 20–50 %'
+                       WHEN cov.fully_vaccinated_pct < 70 THEN '3. 50–70 %'
+                       ELSE '4. 70 % и выше'
+                   END AS vaccination_tier,
+                   COUNT(*) AS countries,
+                   ROUND(AVG(d.deaths_per_million_2022), 1) AS avg_deaths_per_million_2022,
+                   ROUND(AVG(l.median_age), 1) AS avg_median_age,
+                   ROUND(AVG(l.gdp_per_capita), 0) AS avg_gdp_per_capita
+            FROM locations l
+            LEFT JOIN coverage cov ON cov.iso_code = l.iso_code
+            LEFT JOIN deaths_2022 d ON d.iso_code = l.iso_code
+            WHERE l.is_aggregate = 0 AND l.population >= 1000000
+            GROUP BY vaccination_tier
+            ORDER BY vaccination_tier;
+        """,
+    },
+    "countries_without_vaccination_data": {
+        "описание": "Страны с данными о случаях, но без единой записи о вакцинации (анти-соединение NOT EXISTS)",
+        "конструкции": ["NOT EXISTS", "JOIN"],
+        "sql": """
+            SELECT l.location, c.continent_name AS continent, l.population, l.n_days_reported
+            FROM locations l
+            JOIN continents c ON c.continent_id = l.continent_id
+            WHERE l.is_aggregate = 0
+              AND NOT EXISTS (SELECT 1 FROM vaccinations v WHERE v.iso_code = l.iso_code)
+            ORDER BY l.population DESC;
+        """,
+    },
+    "running_total_check": {
+        "описание": "Проверка целостности: накопительная сумма new_cases (оконная SUM) против total_cases OWID (Казахстан)",
+        "конструкции": ["оконная функция SUM ... OVER (ORDER BY)", "подзапрос"],
+        "sql": """
+            SELECT date, new_cases, total_cases,
+                   running_total,
+                   total_cases - running_total AS difference
+            FROM (
+                SELECT date, new_cases, total_cases,
+                       SUM(new_cases) OVER (ORDER BY date ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS running_total
+                FROM daily_stats
+                WHERE iso_code = 'KAZ'
+            )
+            WHERE date IN ('2020-12-31', '2021-12-31', '2022-12-31', '2023-12-31', '2024-05-13')
+            ORDER BY date;
         """,
     },
 }

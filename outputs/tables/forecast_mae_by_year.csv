@@ -1,0 +1,265 @@
+location,model,horizon_weeks,year,mae
+Brazil,linear_regression,1,2021,164.4
+Brazil,linear_regression,1,2022,318.2
+Brazil,linear_regression,1,2023,114.3
+Brazil,linear_regression,4,2021,403.9
+Brazil,linear_regression,4,2022,918.3
+Brazil,linear_regression,4,2023,546.0
+Brazil,moving_average,1,2021,239.5
+Brazil,moving_average,1,2022,687.8
+Brazil,moving_average,1,2023,168.7
+Brazil,moving_average,4,2021,380.0
+Brazil,moving_average,4,2022,1255.5
+Brazil,moving_average,4,2023,262.9
+Brazil,naive,1,2021,147.8
+Brazil,naive,1,2022,346.6
+Brazil,naive,1,2023,92.1
+Brazil,naive,4,2021,331.9
+Brazil,naive,4,2022,1061.0
+Brazil,naive,4,2023,247.1
+Brazil,seasonal_naive,1,2021,1126.6
+Brazil,seasonal_naive,1,2022,971.5
+Brazil,seasonal_naive,1,2023,1875.5
+Brazil,seasonal_naive,4,2021,1087.6
+Brazil,seasonal_naive,4,2022,971.5
+Brazil,seasonal_naive,4,2023,1687.6
+Germany,linear_regression,1,2021,170.4
+Germany,linear_regression,1,2022,699.3
+Germany,linear_regression,1,2023,217.8
+Germany,linear_regression,4,2021,712.6
+Germany,linear_regression,4,2022,4883.1
+Germany,linear_regression,4,2023,901.2
+Germany,moving_average,1,2021,485.1
+Germany,moving_average,1,2022,2483.2
+Germany,moving_average,1,2023,382.7
+Germany,moving_average,4,2021,845.0
+Germany,moving_average,4,2022,4244.3
+Germany,moving_average,4,2023,622.7
+Germany,naive,1,2021,234.8
+Germany,naive,1,2022,1197.4
+Germany,naive,1,2023,162.1
+Germany,naive,4,2021,756.8
+Germany,naive,4,2022,3724.4
+Germany,naive,4,2023,530.3
+Germany,seasonal_naive,1,2021,818.7
+Germany,seasonal_naive,1,2022,6083.0
+Germany,seasonal_naive,1,2023,11352.6
+Germany,seasonal_naive,4,2021,797.4
+Germany,seasonal_naive,4,2022,6083.0
+Germany,seasonal_naive,4,2023,10225.3
+India,linear_regression,1,2021,42.2
+India,linear_regression,1,2022,34.7
+India,linear_regression,1,2023,10.1
+India,linear_regression,4,2021,345.7
+India,linear_regression,4,2022,245.1
+India,linear_regression,4,2023,108.7
+India,moving_average,1,2021,172.0
+India,moving_average,1,2022,124.8
+India,moving_average,1,2023,7.0
+India,moving_average,4,2021,346.0
+India,moving_average,4,2022,206.5
+India,moving_average,4,2023,12.1
+India,naive,1,2021,77.3
+India,naive,1,2022,59.4
+India,naive,1,2023,4.8
+India,naive,4,2021,283.5
+India,naive,4,2022,189.5
+India,naive,4,2023,13.4
+India,seasonal_naive,1,2021,344.5
+India,seasonal_naive,1,2022,395.4
+India,seasonal_naive,1,2023,323.0
+India,seasonal_naive,4,2021,361.7
+India,seasonal_naive,4,2022,395.4
+India,seasonal_naive,4,2023,277.9
+Italy,linear_regression,1,2021,243.5
+Italy,linear_regression,1,2022,918.1
+Italy,linear_regression,1,2023,161.6
+Italy,linear_regression,4,2021,701.4
+Italy,linear_regression,4,2022,3909.2
+Italy,linear_regression,4,2023,1084.1
+Italy,moving_average,1,2021,545.1
+Italy,moving_average,1,2022,2744.0
+Italy,moving_average,1,2023,304.7
+Italy,moving_average,4,2021,896.6
+Italy,moving_average,4,2022,4609.8
+Italy,moving_average,4,2023,703.7
+Italy,naive,1,2021,314.7
+Italy,naive,1,2022,1274.4
+Italy,naive,1,2023,117.4
+Italy,naive,4,2021,782.4
+Italy,naive,4,2022,4357.5
+Italy,naive,4,2023,468.5
+Italy,seasonal_naive,1,2021,1256.2
+Italy,seasonal_naive,1,2022,5185.1
+Italy,seasonal_naive,1,2023,9204.9
+Italy,seasonal_naive,4,2021,1235.5
+Italy,seasonal_naive,4,2022,5185.1
+Italy,seasonal_naive,4,2023,8336.8
+Japan,linear_regression,1,2021,61.6
+Japan,linear_regression,1,2022,958.9
+Japan,linear_regression,1,2023,396.9
+Japan,linear_regression,4,2021,231.7
+Japan,linear_regression,4,2022,2569.5
+Japan,linear_regression,4,2023,1178.9
+Japan,moving_average,1,2021,144.2
+Japan,moving_average,1,2022,1709.2
+Japan,moving_average,1,2023,1158.9
+Japan,moving_average,4,2021,272.8
+Japan,moving_average,4,2022,3228.5
+Japan,moving_average,4,2023,2292.1
+Japan,naive,1,2021,65.2
+Japan,naive,1,2022,857.3
+Japan,naive,1,2023,526.8
+Japan,naive,4,2021,229.8
+Japan,naive,4,2022,2676.3
+Japan,naive,4,2023,1702.3
+Japan,seasonal_naive,1,2021,230.4
+Japan,seasonal_naive,1,2022,4001.8
+Japan,seasonal_naive,1,2023,2873.5
+Japan,seasonal_naive,4,2021,227.7
+Japan,seasonal_naive,4,2022,4001.8
+Japan,seasonal_naive,4,2023,2724.9
+Kazakhstan,linear_regression,1,2021,93.5
+Kazakhstan,linear_regression,1,2022,193.3
+Kazakhstan,linear_regression,1,2023,55.2
+Kazakhstan,linear_regression,4,2021,458.9
+Kazakhstan,linear_regression,4,2022,773.6
+Kazakhstan,linear_regression,4,2023,316.7
+Kazakhstan,moving_average,1,2021,309.3
+Kazakhstan,moving_average,1,2022,421.2
+Kazakhstan,moving_average,1,2023,10.2
+Kazakhstan,moving_average,4,2021,616.6
+Kazakhstan,moving_average,4,2022,662.7
+Kazakhstan,moving_average,4,2023,15.9
+Kazakhstan,naive,1,2021,134.3
+Kazakhstan,naive,1,2022,221.2
+Kazakhstan,naive,1,2023,7.1
+Kazakhstan,naive,4,2021,510.9
+Kazakhstan,naive,4,2022,639.7
+Kazakhstan,naive,4,2023,15.9
+Kazakhstan,seasonal_naive,1,2021,672.4
+Kazakhstan,seasonal_naive,1,2022,930.1
+Kazakhstan,seasonal_naive,1,2023,875.2
+Kazakhstan,seasonal_naive,4,2021,687.4
+Kazakhstan,seasonal_naive,4,2022,930.1
+Kazakhstan,seasonal_naive,4,2023,750.8
+Russia,linear_regression,1,2021,43.3
+Russia,linear_regression,1,2022,272.7
+Russia,linear_regression,1,2023,78.4
+Russia,linear_regression,4,2021,199.7
+Russia,linear_regression,4,2022,1630.9
+Russia,linear_regression,4,2023,362.3
+Russia,moving_average,1,2021,173.7
+Russia,moving_average,1,2022,947.0
+Russia,moving_average,1,2023,115.0
+Russia,moving_average,4,2021,335.0
+Russia,moving_average,4,2022,1719.8
+Russia,moving_average,4,2023,209.2
+Russia,naive,1,2021,76.2
+Russia,naive,1,2022,430.9
+Russia,naive,1,2023,61.8
+Russia,naive,4,2021,269.0
+Russia,naive,4,2022,1474.3
+Russia,naive,4,2023,183.3
+Russia,seasonal_naive,1,2021,551.2
+Russia,seasonal_naive,1,2022,1414.7
+Russia,seasonal_naive,1,2023,2524.2
+Russia,seasonal_naive,4,2021,521.5
+Russia,seasonal_naive,4,2022,1414.7
+Russia,seasonal_naive,4,2023,2182.3
+South Africa,linear_regression,1,2021,164.1
+South Africa,linear_regression,1,2022,75.1
+South Africa,linear_regression,1,2023,42.1
+South Africa,linear_regression,4,2021,493.4
+South Africa,linear_regression,4,2022,340.7
+South Africa,linear_regression,4,2023,255.5
+South Africa,moving_average,1,2021,385.5
+South Africa,moving_average,1,2022,134.5
+South Africa,moving_average,1,2023,10.8
+South Africa,moving_average,4,2021,681.6
+South Africa,moving_average,4,2022,249.5
+South Africa,moving_average,4,2023,15.6
+South Africa,naive,1,2021,210.0
+South Africa,naive,1,2022,50.4
+South Africa,naive,1,2023,10.3
+South Africa,naive,4,2021,562.2
+South Africa,naive,4,2022,221.2
+South Africa,naive,4,2023,16.7
+South Africa,seasonal_naive,1,2021,426.9
+South Africa,seasonal_naive,1,2022,645.6
+South Africa,seasonal_naive,1,2023,306.3
+South Africa,seasonal_naive,4,2021,375.1
+South Africa,seasonal_naive,4,2022,645.6
+South Africa,seasonal_naive,4,2023,351.3
+United Kingdom,linear_regression,1,2021,530.3
+United Kingdom,linear_regression,1,2022,1020.7
+United Kingdom,linear_regression,1,2023,158.6
+United Kingdom,linear_regression,4,2021,2150.9
+United Kingdom,linear_regression,4,2022,2725.0
+United Kingdom,linear_regression,4,2023,780.5
+United Kingdom,moving_average,1,2021,1068.0
+United Kingdom,moving_average,1,2022,1520.1
+United Kingdom,moving_average,1,2023,116.1
+United Kingdom,moving_average,4,2021,1572.6
+United Kingdom,moving_average,4,2022,2430.5
+United Kingdom,moving_average,4,2023,176.4
+United Kingdom,naive,1,2021,642.9
+United Kingdom,naive,1,2022,695.8
+United Kingdom,naive,1,2023,57.4
+United Kingdom,naive,4,2021,1477.3
+United Kingdom,naive,4,2022,2289.7
+United Kingdom,naive,4,2023,162.9
+United Kingdom,seasonal_naive,1,2021,2344.0
+United Kingdom,seasonal_naive,1,2022,3986.7
+United Kingdom,seasonal_naive,1,2023,6413.4
+United Kingdom,seasonal_naive,4,2021,2265.6
+United Kingdom,seasonal_naive,4,2022,3986.7
+United Kingdom,seasonal_naive,4,2023,5589.1
+United States,linear_regression,1,2021,305.9
+United States,linear_regression,1,2022,471.8
+United States,linear_regression,1,2023,216.1
+United States,linear_regression,4,2021,843.1
+United States,linear_regression,4,2022,2365.6
+United States,linear_regression,4,2023,915.2
+United States,moving_average,1,2021,633.8
+United States,moving_average,1,2022,1332.0
+United States,moving_average,1,2023,154.1
+United States,moving_average,4,2021,1151.1
+United States,moving_average,4,2022,2453.5
+United States,moving_average,4,2023,330.8
+United States,naive,1,2021,345.9
+United States,naive,1,2022,599.9
+United States,naive,1,2023,97.6
+United States,naive,4,2021,945.3
+United States,naive,4,2022,2130.4
+United States,naive,4,2023,230.5
+United States,seasonal_naive,1,2021,1249.1
+United States,seasonal_naive,1,2022,1959.4
+United States,seasonal_naive,1,2023,3671.2
+United States,seasonal_naive,4,2021,1087.8
+United States,seasonal_naive,4,2022,1959.4
+United States,seasonal_naive,4,2023,3486.5
+World,linear_regression,1,2021,34.6
+World,linear_regression,1,2022,305.1
+World,linear_regression,1,2023,403.0
+World,linear_regression,4,2021,134.9
+World,linear_regression,4,2022,626.5
+World,linear_regression,4,2023,1111.8
+World,moving_average,1,2021,97.2
+World,moving_average,1,2022,406.0
+World,moving_average,1,2023,470.2
+World,moving_average,4,2021,173.6
+World,moving_average,4,2022,690.4
+World,moving_average,4,2023,643.5
+World,naive,1,2021,49.5
+World,naive,1,2022,250.5
+World,naive,1,2023,188.4
+World,naive,4,2021,149.4
+World,naive,4,2022,598.7
+World,naive,4,2023,607.9
+World,seasonal_naive,1,2021,295.9
+World,seasonal_naive,1,2022,625.7
+World,seasonal_naive,1,2023,1329.7
+World,seasonal_naive,4,2021,281.1
+World,seasonal_naive,4,2022,625.7
+World,seasonal_naive,4,2023,1198.2

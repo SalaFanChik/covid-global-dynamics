@@ -19,6 +19,7 @@ from matplotlib.colors import LinearSegmentedColormap
 import config
 from src.timeseries import weekly_series
 from src.utils import log
+from src.waves import prepare_series, relative_threshold
 
 # Категориальная палитра (фиксированный порядок)
 PALETTE = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100", "#e87ba4", "#008300", "#6250d6", "#e34948"]
@@ -90,6 +91,7 @@ def plot_waves_small_multiples(weekly, waves, locations, name="waves_small_multi
 def plot_wave_methods(weekly, waves_threshold, waves_peaks, location, name="wave_methods_comparison"):
     """Сравнение двух методов детекции волн на одной стране: порог (baseline) и пики."""
     series = weekly_series(weekly, location)
+    threshold = relative_threshold(prepare_series(series))      # медиана ненулевых недель страны
     fig, axes = plt.subplots(2, 1, figsize=(13, 7), sharex=True)
     pairs = [(axes[0], waves_threshold, "порог (baseline)", PALETTE[6]),
              (axes[1], waves_peaks, "пики find_peaks", PALETTE[1])]
@@ -97,8 +99,9 @@ def plot_wave_methods(weekly, waves_threshold, waves_peaks, location, name="wave
         ax.plot(series.index, series.values, color=PALETTE[0], linewidth=1.8)
         country_waves = waves[waves["location"] == location]
         shade_waves(ax, country_waves, color, f"волна: {title}")
-        ax.axhline(config.WAVE_THRESHOLD_PER_MILLION, color="gray", linewidth=1, linestyle=":",
-                   label=f"порог {config.WAVE_THRESHOLD_PER_MILLION} на млн")
+        if threshold is not None and title.startswith("порог"):
+            ax.axhline(threshold, color="gray", linewidth=1, linestyle=":",
+                       label=f"порог = медиана ненулевых недель: {threshold:.0f} на млн")
         ax.set_title(f"{location} — метод «{title}»: {len(country_waves)} волн")
         ax.set_ylabel("случаев на млн / нед.")
         ax.set_xlim(WAVES_XLIM)
@@ -145,15 +148,30 @@ def plot_correlation_heatmap(matrix, name="correlation_heatmap"):
 
 # ---------- 4. Декомпозиция ----------
 
-def plot_decomposition(result, title, name="seasonal_decomposition_world"):
+def plot_decomposition(result, title, period_label="период 52 недели", name="seasonal_decomposition_world"):
     """Четыре панели: исходный ряд, тренд, сезонность, остаток."""
     parts = [("исходный ряд", result.observed), ("тренд", result.trend),
-             ("сезонность (период 52 недели)", result.seasonal), ("остаток", result.resid)]
+             (f"сезонность ({period_label})", result.seasonal), ("остаток", result.resid)]
     fig, axes = plt.subplots(4, 1, figsize=(13, 9), sharex=True)
     for ax, (label, series) in zip(axes, parts):
         ax.plot(series.index, series.values, color=PALETTE[0], linewidth=1.5)
         ax.set_ylabel(label, fontsize=9)
     axes[0].set_title(title)
+    return save_figure(fig, name)
+
+
+def plot_weekday_effect(effect, location, name="weekday_effect"):
+    """Столбцы: на сколько процентов регистрация случаев в каждый день недели отличается от среднего."""
+    days = list(effect.keys())
+    values = list(effect.values())
+    fig, ax = plt.subplots(figsize=(8, 4.5))
+    colors = [PALETTE[0] if value >= 0 else PALETTE[1] for value in values]
+    ax.bar(days, values, color=colors, width=0.6)
+    ax.axhline(0, color="black", linewidth=0.8)
+    for position, value in enumerate(values):
+        ax.text(position, value + (1.5 if value >= 0 else -4), f"{value:+.0f} %", ha="center", fontsize=9)
+    ax.set_ylabel("отклонение от среднего уровня, %")
+    ax.set_title(f"{location}: эффект дня недели в регистрации случаев (сезонная компонента, период 7 дней)")
     return save_figure(fig, name)
 
 

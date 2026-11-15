@@ -9,7 +9,9 @@ __pycache__/
 data/raw/*.csv
 !data/raw/owid-covid-codebook.csv
 
-# большие производные файлы пересоздаются командой python main.py
+# большие производные файлы пересоздаются командой python main.py;
+# снимок очищенных данных (≈21 МБ) оставляем — с ним проект запускается без интернета
 data/processed/*.parquet
+!data/processed/covid_clean.parquet
 data/*.db
 .claude/

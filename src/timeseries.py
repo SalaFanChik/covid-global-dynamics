@@ -52,10 +52,14 @@ def make_weekly_table(df):
         df.groupby(["iso_code", grouper], observed=True)
           .agg(new_cases=("new_cases", "sum"),
                new_deaths=("new_deaths", "sum"),
-               days=("date", "size"))                     # сколько дней попало в неделю
+               days=("date", "size"),                     # сколько дней попало в неделю
+               days_reported=("new_cases", "count"))      # сколько из них с отчётом (не NaN)
           .reset_index()
     )
     weekly = weekly[weekly["days"] > 0].copy()           # пустые недели (их добавляет Grouper) убираем
+    # неделя без единого отчёта — это пропуск, а не ноль (sum() дал бы 0)
+    no_report = weekly["days_reported"] == 0
+    weekly.loc[no_report, ["new_cases", "new_deaths"]] = float("nan")
     weekly["week_start"] = weekly["date"] - pd.Timedelta(days=6)   # понедельник той же недели
     weekly = weekly.drop(columns="date")
 
@@ -67,7 +71,7 @@ def make_weekly_table(df):
     weekly["new_cases_per_million"] = weekly["new_cases"] / weekly["population"] * 1_000_000
     weekly["new_deaths_per_million"] = weekly["new_deaths"] / weekly["population"] * 1_000_000
 
-    columns = ["iso_code", "week_start", "new_cases", "new_deaths", "days"] + LOCATION_INFO + [
+    columns = ["iso_code", "week_start", "new_cases", "new_deaths", "days", "days_reported"] + LOCATION_INFO + [
         "new_cases_per_million", "new_deaths_per_million"]
     weekly = weekly[columns].sort_values(["iso_code", "week_start"]).reset_index(drop=True)
     log(f"Недельная таблица: {len(weekly):,} строк, {weekly['iso_code'].nunique()} локаций")
@@ -79,11 +83,13 @@ def make_monthly_table(df):
     grouper = pd.Grouper(key="date", freq="MS")           # метка — первое число месяца
     monthly = (
         df.groupby(["iso_code", grouper], observed=True)
-          .agg(new_cases=("new_cases", "sum"), new_deaths=("new_deaths", "sum"), days=("date", "size"))
+          .agg(new_cases=("new_cases", "sum"), new_deaths=("new_deaths", "sum"),
+               days=("date", "size"), days_reported=("new_cases", "count"))
           .reset_index()
           .rename(columns={"date": "month"})
     )
     monthly = monthly[monthly["days"] > 0].copy()
+    monthly.loc[monthly["days_reported"] == 0, ["new_cases", "new_deaths"]] = float("nan")
     info = df.groupby("iso_code", observed=True)[LOCATION_INFO].first().reset_index()
     monthly = monthly.merge(info, on="iso_code", how="left")
     monthly["new_cases_per_million"] = monthly["new_cases"] / monthly["population"] * 1_000_000
@@ -108,6 +114,19 @@ def decompose_series(series, period=config.SEASONAL_PERIOD_WEEKS, model="additiv
     if len(series) < 2 * period:
         raise ValueError(f"Для декомпозиции нужно минимум {2 * period} точек, есть {len(series)}")
     return seasonal_decompose(series, model=model, period=period)
+
+
+def weekday_effect(result):
+    """
+    Эффект дня недели из дневной декомпозиции (period=7): средняя сезонная компонента
+    по дням недели в процентах от среднего уровня ряда. Показывает, насколько регистрация
+    случаев «проседает» в выходные — главный аргумент в пользу недельной частоты анализа.
+    """
+    seasonal = result.seasonal.dropna()
+    level = float(result.observed.mean())
+    by_weekday = seasonal.groupby(seasonal.index.day_of_week).mean() / level * 100
+    names = ["пн", "вт", "ср", "чт", "пт", "сб", "вс"]
+    return {names[day]: round(float(value), 1) for day, value in by_weekday.items()}
 
 
 def seasonality_strength(result):

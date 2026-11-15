@@ -28,13 +28,13 @@ def feature_types(df):
     types = {"числовые": [], "категориальные": [], "дата": [], "логические": []}
     for column in df.columns:
         dtype = df[column].dtype
-        if str(dtype) == "category" or dtype == object or str(dtype) == "str":
+        if isinstance(dtype, pd.CategoricalDtype) or pd.api.types.is_string_dtype(dtype):
             types["категориальные"].append(column)
-        elif str(dtype).startswith("datetime"):
+        elif pd.api.types.is_datetime64_any_dtype(dtype):
             types["дата"].append(column)
-        elif dtype == bool:
+        elif pd.api.types.is_bool_dtype(dtype):
             types["логические"].append(column)
-        else:
+        elif pd.api.types.is_numeric_dtype(dtype):
             types["числовые"].append(column)
     return types
 
@@ -97,7 +97,10 @@ def country_summary(df):
     countries = df[~df["is_aggregate"]].sort_values(["iso_code", "date"])
     last = countries.groupby("iso_code", observed=True).last()      # последняя строка каждой страны
     maxima = countries.groupby("iso_code", observed=True)[
-        ["people_fully_vaccinated_per_hundred", "total_boosters_per_hundred", "stringency_index"]].max()
+        ["people_fully_vaccinated_per_hundred", "total_boosters_per_hundred", "stringency_index",
+         "total_tests_per_thousand"]].max()
+    # last() берёт последнее НЕпустое значение в группе — удобно для редких показателей
+    last_excess = countries.groupby("iso_code", observed=True)["excess_mortality_cumulative_per_million"].last()
 
     summary = pd.DataFrame({
         "location": last["location"],
@@ -109,6 +112,8 @@ def country_summary(df):
         "people_fully_vaccinated_per_hundred": maxima["people_fully_vaccinated_per_hundred"],
         "total_boosters_per_hundred": maxima["total_boosters_per_hundred"],
         "max_stringency_index": maxima["stringency_index"],
+        "total_tests_per_thousand": maxima["total_tests_per_thousand"],
+        "excess_mortality_cumulative_per_million": last_excess,
     })
     for column in STATIC_COLUMNS:
         summary[column] = last[column]
