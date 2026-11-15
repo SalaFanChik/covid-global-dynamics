@@ -1,0 +1,14 @@
+# виртуальное окружение
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.DS_Store
+
+# сырые данные скачиваются скриптом scripts/download_data.py (файл ~185 МБ)
+data/raw/*.csv
+!data/raw/owid-covid-codebook.csv
+
+# большие производные файлы пересоздаются командой python main.py
+data/processed/*.parquet
+data/*.db

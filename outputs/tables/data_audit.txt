@@ -1,0 +1,19 @@
+ОТЧЁТ ОБ АУДИТЕ КАЧЕСТВА ДАННЫХ OWID COVID-19
+
+Строк: 629,868, столбцов: 61, локаций: 262
+Период: 2020-01-01 — 2026-10-18
+Дубликатов ключа (location, date): 0
+Отрицательные значения: {'new_cases': 0, 'new_deaths': 0, 'new_vaccinations': 0, 'new_tests': 0}
+Доля нулей в new_cases: 65.5% (недельная отчётность с 2023 г.)
+Полностью пустые столбцы: ['human_development_index']
+Локации без ISO-кода: ['Asia excl. China', 'England', 'England and Wales', 'High-income countries', 'Low-income countries', 'Lower-middle-income countries', 'Northern Ireland', 'Scotland', 'Summer Olympics 2020', 'Upper-middle-income countries', 'Wales', 'Winter Olympics 2022', 'World excl. China', 'World excl. China and South Korea', 'World excl. China, South Korea, Japan and Singapore']
+
+Шаги очистки:
+1. удалены пустые столбцы: human_development_index — 629,868 строк. столбцы не содержат ни одного значения
+2. удалены локации без ISO-кода — 26,184 строк. не страны и не официальные агрегаты OWID: Asia excl. China, England, England and Wales, High-income countries, Low-income countries, Lower-middle-income countries, Northern Ireland, Scotland, Summer Olympics 2020, Upper-middle-income countries, Wales, Winter Olympics 2022, World excl. China, World excl. China and South Korea, World excl. China, South Korea, Japan and Singapore
+3. помечены агрегаты OWID (is_aggregate=True) — 19,840 строк. World, континенты и ЕС нужны для графиков, но не должны попадать в статистику по странам
+4. пропуски new_cases заменены на 0 — 10,896 строк. пропуск стоит до первого отчёта или в день без отчёта, т. е. новых случаев не было
+5. пропуски new_deaths заменены на 0 — 9,633 строк. пропуск стоит до первого отчёта или в день без отчёта, т. е. новых случаев не было
+6. отрицательные new_cases обрезаны до 0 — 0 строк. отрицательные значения — это задним числом исправленная статистика, а не реальные случаи
+7. отрицательные new_deaths обрезаны до 0 — 0 строк. отрицательные значения — это задним числом исправленная статистика, а не реальные случаи
+8. сортировка по (location, date), добавлен столбец year — 603,684 строк. год нужен для фильтров дашборда и SQL-запросов
