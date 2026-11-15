@@ -1,0 +1,120 @@
+erDiagram
+    continents ||--o{ locations : "continent_id"
+    locations  ||--o{ daily_stats : "iso_code"
+    locations  ||--o{ weekly_stats : "iso_code"
+    locations  ||--o{ vaccinations : "iso_code"
+    locations  ||--o{ hospitalizations : "iso_code"
+    locations  ||--o{ testing : "iso_code"
+    locations  ||--o{ excess_mortality : "iso_code"
+    locations  ||--o{ waves : "iso_code"
+    locations  ||--o{ forecast_results : "iso_code"
+
+    continents {
+        INTEGER continent_id PK
+        TEXT continent_name UK
+    }
+    locations {
+        TEXT iso_code PK
+        TEXT location UK
+        INTEGER continent_id FK
+        INTEGER is_aggregate
+        REAL population
+        REAL population_density
+        REAL median_age
+        REAL life_expectancy
+        REAL gdp_per_capita
+        REAL extreme_poverty
+        REAL diabetes_prevalence
+        REAL handwashing_facilities
+        REAL hospital_beds_per_thousand
+    }
+    daily_stats {
+        TEXT iso_code PK, FK
+        TEXT date PK
+        REAL new_cases
+        REAL new_deaths
+        REAL total_cases
+        REAL total_deaths
+        REAL new_cases_smoothed
+        REAL new_deaths_smoothed
+        REAL new_cases_per_million
+        REAL new_deaths_per_million
+        REAL total_cases_per_million
+        REAL total_deaths_per_million
+        REAL reproduction_rate
+        REAL stringency_index
+    }
+    weekly_stats {
+        TEXT iso_code PK, FK
+        TEXT week_start PK
+        REAL new_cases
+        REAL new_deaths
+        REAL new_cases_per_million
+        REAL new_deaths_per_million
+    }
+    vaccinations {
+        TEXT iso_code PK, FK
+        TEXT date PK
+        REAL total_vaccinations
+        REAL people_vaccinated
+        REAL people_fully_vaccinated
+        REAL total_boosters
+        REAL new_vaccinations
+        REAL people_vaccinated_per_hundred
+        REAL people_fully_vaccinated_per_hundred
+        REAL total_boosters_per_hundred
+    }
+    hospitalizations {
+        TEXT iso_code PK, FK
+        TEXT date PK
+        REAL icu_patients
+        REAL icu_patients_per_million
+        REAL hosp_patients
+        REAL hosp_patients_per_million
+        REAL weekly_icu_admissions
+        REAL weekly_icu_admissions_per_million
+        REAL weekly_hosp_admissions
+        REAL weekly_hosp_admissions_per_million
+    }
+    testing {
+        TEXT iso_code PK, FK
+        TEXT date PK
+        REAL new_tests
+        REAL total_tests
+        REAL positive_rate
+        REAL tests_per_case
+    }
+    excess_mortality {
+        TEXT iso_code PK, FK
+        TEXT date PK
+        REAL excess_mortality
+        REAL excess_mortality_cumulative
+        REAL excess_mortality_cumulative_absolute
+        REAL excess_mortality_cumulative_per_million
+    }
+    waves {
+        INTEGER wave_id PK
+        TEXT iso_code FK
+        TEXT method
+        INTEGER wave_no
+        TEXT start_date
+        TEXT peak_date
+        TEXT end_date
+        INTEGER duration_weeks
+        REAL peak_weekly_cases_per_million
+        REAL total_cases
+        REAL total_deaths
+        REAL cfr_pct
+        TEXT size
+    }
+    forecast_results {
+        INTEGER id PK
+        TEXT iso_code FK
+        TEXT model
+        INTEGER horizon_weeks
+        INTEGER n_forecasts
+        REAL mae
+        REAL mae_vs_naive
+        REAL seconds
+        INTEGER is_baseline
+    }
