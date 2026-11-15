@@ -262,10 +262,11 @@ def plotly_weekly_lines(weekly, locations, name="interactive_weekly_cases"):
         buttons.append({"label": label, "method": "update",
                         "args": [{"visible": visible}, {"yaxis": {"title": label}}]})
     fig.update_layout(
-        title="COVID-19: недельная динамика по странам (наведите курсор, выделите период, выключите страну в легенде)",
+        title={"text": "COVID-19: недельная динамика по странам<br><sup>наведите курсор, выделите период, "
+                       "выключите страну в легенде; показатель выбирается в списке справа</sup>", "x": 0.0},
         xaxis_title="неделя", yaxis_title=metrics[0][1], template="plotly_white", hovermode="x unified",
-        updatemenus=[{"buttons": buttons, "direction": "down", "x": 0.0, "xanchor": "left", "y": 1.12, "yanchor": "top"}],
-        legend={"orientation": "h", "y": -0.2})
+        updatemenus=[{"buttons": buttons, "direction": "down", "x": 1.0, "xanchor": "right", "y": 1.18, "yanchor": "top"}],
+        legend={"orientation": "h", "y": -0.2}, margin={"t": 90})
     return save_html(fig, name)
 
 
