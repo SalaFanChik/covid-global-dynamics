@@ -270,8 +270,12 @@ def run_all():
     timings = {}
     with Timer() as total:
         for number, (name, step) in enumerate(PIPELINE_STEPS.items(), start=1):
-            with Timer() as timer:
-                step()
+            try:
+                with Timer() as timer:
+                    step()
+            except (FileNotFoundError, ConnectionError, ValueError) as error:
+                log(f"Шаг {number} «{name}» не выполнен: {error}")
+                sys.exit(1)
             timings[f"{number}. {name}"] = timer.seconds
             log(f"--- шаг {number} выполнен за {timer.seconds} с ---")
     timings["всего"] = total.seconds

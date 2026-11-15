@@ -1,12 +1,12 @@
 location,model,horizon_weeks,n_forecasts,mae,seconds,mae_vs_naive,is_baseline
 Kazakhstan,naive,1,121,152.69,0.002,1.0,True
 Kazakhstan,naive,4,121,480.34,0.002,1.0,True
-Kazakhstan,seasonal_naive,1,121,813.35,0.002,5.327,True
-Kazakhstan,seasonal_naive,4,121,802.74,0.002,1.671,True
-Kazakhstan,moving_average,1,121,312.91,0.005,2.049,False
-Kazakhstan,moving_average,4,121,532.17,0.005,1.108,False
-Kazakhstan,linear_regression,1,121,130.67,0.063,0.856,False
-Kazakhstan,linear_regression,4,121,569.48,0.063,1.186,False
+Kazakhstan,seasonal_naive,1,121,813.35,0.003,5.327,True
+Kazakhstan,seasonal_naive,4,121,802.74,0.003,1.671,True
+Kazakhstan,moving_average,1,121,312.91,0.004,2.049,False
+Kazakhstan,moving_average,4,121,532.17,0.004,1.108,False
+Kazakhstan,linear_regression,1,121,130.67,0.062,0.856,False
+Kazakhstan,linear_regression,4,121,569.48,0.062,1.186,False
 Russia,naive,1,121,226.49,0.002,1.0,True
 Russia,naive,4,121,772.12,0.002,1.0,True
 Russia,seasonal_naive,1,121,1215.8,0.002,5.368,True
@@ -15,10 +15,10 @@ Russia,moving_average,1,121,497.29,0.004,2.196,False
 Russia,moving_average,4,121,908.26,0.004,1.176,False
 Russia,linear_regression,1,121,147.09,0.05,0.649,False
 Russia,linear_regression,4,121,842.96,0.05,1.092,False
-Germany,naive,1,121,637.67,0.002,1.0,True
-Germany,naive,4,121,1992.84,0.002,1.0,True
-Germany,seasonal_naive,1,121,4648.08,0.002,7.289,True
-Germany,seasonal_naive,4,121,4705.12,0.002,2.361,True
+Germany,naive,1,121,637.67,0.003,1.0,True
+Germany,naive,4,121,1992.84,0.003,1.0,True
+Germany,seasonal_naive,1,121,4648.08,0.003,7.289,True
+Germany,seasonal_naive,4,121,4705.12,0.003,2.361,True
 Germany,moving_average,1,121,1328.55,0.004,2.083,False
 Germany,moving_average,4,121,2267.26,0.004,1.138,False
 Germany,linear_regression,1,121,404.74,0.05,0.635,False
@@ -29,16 +29,16 @@ United States,seasonal_naive,1,121,1914.65,0.002,4.58,True
 United States,seasonal_naive,4,120,1865.26,0.002,1.392,True
 United States,moving_average,1,121,862.52,0.004,2.063,False
 United States,moving_average,4,120,1578.77,0.004,1.178,False
-United States,linear_regression,1,121,363.83,0.05,0.87,False
-United States,linear_regression,4,120,1514.87,0.05,1.131,False
+United States,linear_regression,1,121,363.83,0.049,0.87,False
+United States,linear_regression,4,120,1514.87,0.049,1.131,False
 Brazil,naive,1,121,224.96,0.002,1.0,True
 Brazil,naive,4,121,630.53,0.002,1.0,True
 Brazil,seasonal_naive,1,121,1171.35,0.002,5.207,True
 Brazil,seasonal_naive,4,121,1141.82,0.002,1.811,True
 Brazil,moving_average,1,121,421.62,0.004,1.874,False
 Brazil,moving_average,4,121,735.9,0.004,1.167,False
-Brazil,linear_regression,1,121,223.08,0.049,0.992,False
-Brazil,linear_regression,4,121,649.64,0.049,1.03,False
+Brazil,linear_regression,1,121,223.08,0.05,0.992,False
+Brazil,linear_regression,4,121,649.64,0.05,1.03,False
 India,naive,1,121,58.83,0.002,1.0,True
 India,naive,4,121,196.23,0.002,1.0,True
 India,seasonal_naive,1,121,363.15,0.002,6.173,True
@@ -53,37 +53,37 @@ Italy,seasonal_naive,1,121,4127.1,0.002,5.914,True
 Italy,seasonal_naive,4,121,4165.31,0.002,1.84,True
 Italy,moving_average,1,121,1454.33,0.004,2.084,False
 Italy,moving_average,4,121,2458.88,0.004,1.086,False
-Italy,linear_regression,1,121,521.22,0.049,0.747,False
-Italy,linear_regression,4,121,2146.36,0.049,0.948,False
+Italy,linear_regression,1,121,521.22,0.05,0.747,False
+Italy,linear_regression,4,121,2146.36,0.05,0.948,False
 Japan,naive,1,121,474.28,0.002,1.0,True
 Japan,naive,4,121,1536.75,0.002,1.0,True
 Japan,seasonal_naive,1,121,2244.36,0.002,4.732,True
 Japan,seasonal_naive,4,121,2283.02,0.002,1.486,True
 Japan,moving_average,1,121,967.72,0.004,2.04,False
 Japan,moving_average,4,121,1893.45,0.004,1.232,False
-Japan,linear_regression,1,121,497.1,0.049,1.048,False
-Japan,linear_regression,4,121,1400.75,0.049,0.912,False
-South Africa,naive,1,121,111.71,0.002,1.0,True
-South Africa,naive,4,121,321.0,0.002,1.0,True
+Japan,linear_regression,1,121,497.1,0.051,1.048,False
+Japan,linear_regression,4,121,1400.75,0.051,0.912,False
+South Africa,naive,1,121,111.71,0.003,1.0,True
+South Africa,naive,4,121,321.0,0.003,1.0,True
 South Africa,seasonal_naive,1,121,502.95,0.002,4.502,True
 South Africa,seasonal_naive,4,121,487.22,0.002,1.518,True
-South Africa,moving_average,1,121,221.85,0.004,1.986,False
-South Africa,moving_average,4,121,380.31,0.004,1.185,False
-South Africa,linear_regression,1,121,107.68,0.05,0.964,False
-South Africa,linear_regression,4,121,386.48,0.05,1.204,False
-United Kingdom,naive,1,121,578.53,0.002,1.0,True
-United Kingdom,naive,4,121,1598.33,0.002,1.0,True
-United Kingdom,seasonal_naive,1,121,3655.33,0.002,6.318,True
-United Kingdom,seasonal_naive,4,121,3582.08,0.002,2.241,True
-United Kingdom,moving_average,1,121,1120.69,0.004,1.937,False
-United Kingdom,moving_average,4,121,1698.97,0.004,1.063,False
-United Kingdom,linear_regression,1,121,685.77,0.049,1.185,False
-United Kingdom,linear_regression,4,121,2159.8,0.049,1.351,False
-World,naive,1,121,156.59,0.002,1.0,True
-World,naive,4,121,422.07,0.002,1.0,True
-World,seasonal_naive,1,121,591.42,0.002,3.777,True
-World,seasonal_naive,4,121,588.38,0.002,1.394,True
-World,moving_average,1,121,285.38,0.004,1.822,False
-World,moving_average,4,121,477.24,0.004,1.131,False
-World,linear_regression,1,121,205.64,0.049,1.313,False
-World,linear_regression,4,121,515.74,0.049,1.222,False
+South Africa,moving_average,1,121,221.85,0.005,1.986,False
+South Africa,moving_average,4,121,380.31,0.005,1.185,False
+South Africa,linear_regression,1,121,107.68,0.053,0.964,False
+South Africa,linear_regression,4,121,386.48,0.053,1.204,False
+United Kingdom,naive,1,121,578.53,0.003,1.0,True
+United Kingdom,naive,4,121,1598.33,0.003,1.0,True
+United Kingdom,seasonal_naive,1,121,3655.33,0.003,6.318,True
+United Kingdom,seasonal_naive,4,121,3582.08,0.003,2.241,True
+United Kingdom,moving_average,1,121,1120.69,0.005,1.937,False
+United Kingdom,moving_average,4,121,1698.97,0.005,1.063,False
+United Kingdom,linear_regression,1,121,685.77,0.053,1.185,False
+United Kingdom,linear_regression,4,121,2159.8,0.053,1.351,False
+World,naive,1,121,156.59,0.003,1.0,True
+World,naive,4,121,422.07,0.003,1.0,True
+World,seasonal_naive,1,121,591.42,0.003,3.777,True
+World,seasonal_naive,4,121,588.38,0.003,1.394,True
+World,moving_average,1,121,285.38,0.005,1.822,False
+World,moving_average,4,121,477.24,0.005,1.131,False
+World,linear_regression,1,121,205.64,0.053,1.313,False
+World,linear_regression,4,121,515.74,0.053,1.222,False

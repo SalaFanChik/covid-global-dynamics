@@ -39,11 +39,15 @@ sns.set_theme(style="whitegrid", font_scale=0.95)
 plt.rcParams["axes.titleweight"] = "bold"
 
 
+SOURCE_NOTE = "Источник: Our World in Data, COVID-19 dataset (CC BY 4.0), срез до 2026-10-18; расчёты авторов"
+
+
 def save_figure(fig, name):
-    """Сохраняет фигуру matplotlib в outputs/figures/<name>.png."""
+    """Сохраняет фигуру matplotlib в outputs/figures/<name>.png (с подписью источника внизу)."""
     config.FIGURES_DIR.mkdir(parents=True, exist_ok=True)
     path = config.FIGURES_DIR / f"{name}.png"
-    fig.tight_layout()
+    fig.text(0.01, 0.005, SOURCE_NOTE, fontsize=7, color="#52514e", ha="left", va="bottom")
+    fig.tight_layout(rect=(0, 0.02, 1, 1))
     fig.savefig(path, dpi=150, bbox_inches="tight")
     plt.close(fig)
     log(f"  график сохранён: {path.name}")

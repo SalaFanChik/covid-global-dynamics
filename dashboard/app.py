@@ -43,9 +43,9 @@ def query(sql, params=()):
 
 
 def load_locations():
-    """Справочник стран (без агрегатов) с континентом."""
+    """Справочник стран (без агрегатов) с континентом и датой последнего отчёта о случаях."""
     return query("""
-        SELECT l.iso_code, l.location, c.continent_name AS continent, l.population
+        SELECT l.iso_code, l.location, c.continent_name AS continent, l.population, l.last_report_date
         FROM locations l JOIN continents c ON c.continent_id = l.continent_id
         WHERE l.is_aggregate = 0
         ORDER BY l.location
@@ -111,7 +111,7 @@ def empty_figure(text):
     return fig
 
 
-def figure_weekly(table, metric, waves, first_country):
+def figure_weekly(table, metric, waves, first_country, last_report=None):
     """Линейный график недельных рядов; волны первой выбранной страны закрашены."""
     if table.empty:
         return empty_figure("Выберите хотя бы одну страну")
@@ -127,6 +127,8 @@ def figure_weekly(table, metric, waves, first_country):
     title = f"Недельная динамика: {METRICS[metric]}"
     if len(waves):
         title += f" (закрашены {len(waves)} волн — {first_country})"
+    if last_report:
+        title += f"<br><sup>{first_country}: данные о случаях до {last_report}; разрыв линии = отчёта не было</sup>"
     fig.update_layout(title=title, template="plotly_white", hovermode="x unified",
                       yaxis_title=METRICS[metric], xaxis_title="неделя", legend={"orientation": "h", "y": -0.2},
                       margin={"l": 40, "r": 20, "t": 60, "b": 40})
@@ -188,6 +190,7 @@ def build_app():
     locations = load_locations()
     continents = ["Все"] + sorted(locations["continent"].unique().tolist())
     name_to_iso = dict(zip(locations["location"], locations["iso_code"]))   # словарь страна -> ISO-код
+    last_report = dict(zip(locations["location"], locations["last_report_date"]))
 
     app = Dash(__name__, title="COVID-19 Global Dynamics")
     app.layout = html.Div(style={"fontFamily": "Arial, sans-serif", "margin": "0 24px"}, children=[
@@ -259,30 +262,38 @@ def build_app():
         countries = countries or []
         iso_codes = [name_to_iso[name] for name in countries if name in name_to_iso]
 
-        weekly = weekly_for(iso_codes, year_from, year_to)
-        waves = waves_for(iso_codes[0], year_from, year_to) if iso_codes else pd.DataFrame()
+        try:
+            weekly = weekly_for(iso_codes, year_from, year_to)
+            waves = waves_for(iso_codes[0], year_from, year_to) if iso_codes else pd.DataFrame()
+            totals = totals_by_country(metric, year_from, year_to, continent)
+            vaccination_figure = figure_vaccination(continent)
+        except sqlite3.Error as error:                      # база повреждена или недоступна
+            message = empty_figure(f"Ошибка базы данных: {error}")
+            return message, message, message, message, [], [], "Волны"
         first_country = countries[0] if countries else ""
-        totals = totals_by_country(metric, year_from, year_to, continent)
 
         table_columns = [{"name": name, "id": column} for column, name in {
             "wave_no": "№", "start_date": "начало", "peak_date": "пик", "end_date": "конец",
             "duration_weeks": "недель", "peak_weekly_cases_per_million": "пик, на млн/нед.",
             "cfr_pct": "CFR, %", "size": "размер"}.items()]
         waves_title = f"Волны: {first_country} ({len(waves)})" if first_country else "Волны"
-        return (figure_weekly(weekly, metric, waves, first_country),
+        return (figure_weekly(weekly, metric, waves, first_country, last_report.get(first_country)),
                 figure_map(totals, metric, year_from, year_to),
                 figure_top(totals, metric, continent),
-                figure_vaccination(continent),
+                vaccination_figure,
                 waves.to_dict("records"), table_columns, waves_title)
 
     return app
 
 
 def run_dashboard(host=config.DASH_HOST, port=config.DASH_PORT, debug=False):
-    """Запускает сервер дашборда."""
+    """Запускает сервер дашборда. Занятый порт — частая ошибка на демонстрации, поэтому сообщаем о ней понятно."""
     app = build_app()
     print(f"Дашборд запущен: http://{host}:{port}  (остановить — Ctrl+C)")
-    app.run(host=host, port=port, debug=debug)
+    try:
+        app.run(host=host, port=port, debug=debug)
+    except OSError as error:
+        print(f"Порт {port} занят ({error}). Остановите прошлый экземпляр дашборда или измените DASH_PORT в config.py.")
 
 
 if __name__ == "__main__":

@@ -325,7 +325,7 @@ def run_queries(connection, queries=QUERIES):
         try:
             with Timer() as timer:
                 table = pd.read_sql_query(query["sql"], connection)
-        except sqlite3.Error as error:
+        except (sqlite3.Error, pd.errors.DatabaseError) as error:   # ошибка в SQL не должна ронять весь шаг
             log(f"  ошибка в запросе {name}: {error}")
             continue
         results[name] = table

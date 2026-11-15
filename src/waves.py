@@ -249,7 +249,9 @@ def compare_methods(waves_threshold, waves_peaks, seconds_threshold, seconds_pea
 
     def row(name, waves, seconds):
         countries = waves["iso_code"].nunique()
+        recall, _ = reference_recall(waves)
         return {"метод": name, "волн_всего": int(len(waves)), "стран": int(countries),
+                "найдено_эталонных_пиков_%": recall,
                 "волн_на_страну": round(len(waves) / countries, 2) if countries else None,
                 "медиана_длительности_нед": float(waves["duration_weeks"].median()),
                 "доля_волн_длиннее_года_%": round(100 * float((waves["duration_weeks"] > 52).mean()), 1),
@@ -260,6 +262,27 @@ def compare_methods(waves_threshold, waves_peaks, seconds_threshold, seconds_pea
     summary = pd.DataFrame([row("порог (baseline)", big_threshold, seconds_threshold),
                             row("пики (find_peaks)", big_peaks, seconds_peaks)])
     return summary, matching
+
+
+def reference_recall(waves, reference=config.REFERENCE_PEAKS,
+                     tolerance_weeks=config.WAVE_MATCH_TOLERANCE_WEEKS):
+    """
+    Метрика качества: какая доля эталонных (известных из публикаций) пиков найдена методом
+    в окне ± tolerance_weeks. Возвращает (доля в %, таблица по странам).
+    """
+    rows = []
+    for location, months in reference.items():
+        found_peaks = [pd.Timestamp(d) for d in waves.loc[waves["location"] == location, "peak_date"]]
+        found = 0
+        for month in months:
+            target = pd.Timestamp(month + "-15")            # середина эталонного месяца
+            if any(abs((peak - target).days) <= 7 * tolerance_weeks for peak in found_peaks):
+                found += 1
+        rows.append({"location": location, "эталонных_пиков": len(months), "найдено": found,
+                     "всего_волн_методом": len(found_peaks)})
+    table = pd.DataFrame(rows)
+    recall = round(100 * table["найдено"].sum() / table["эталонных_пиков"].sum(), 1)
+    return recall, table
 
 
 def sensitivity_table(weekly, locations, factors=(1.0, 1.5, 2.0, 3.0)):

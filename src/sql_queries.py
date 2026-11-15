@@ -330,6 +330,39 @@ QUERIES = {
             ORDER BY date;
         """,
     },
+    "tests_vs_cfr": {
+        "описание": "Тестирование и наблюдаемая летальность: чем больше тестов на 1000 жителей, тем ниже CFR (страны ≥ 1 млн)",
+        "конструкции": ["2 CTE", "JOIN 3 таблиц", "коррелированный подзапрос", "CASE WHEN", "GROUP BY"],
+        "sql": """
+            WITH last_tests AS (
+                SELECT t.iso_code, MAX(t.total_tests) * 1000.0 / l.population AS tests_per_thousand
+                FROM testing t
+                JOIN locations l ON l.iso_code = t.iso_code
+                WHERE l.population > 0
+                GROUP BY t.iso_code
+            ),
+            totals AS (
+                SELECT d.iso_code, d.total_cases, d.total_deaths
+                FROM daily_stats d
+                WHERE d.date = (SELECT MAX(date) FROM daily_stats WHERE iso_code = d.iso_code AND total_cases IS NOT NULL)
+            )
+            SELECT CASE
+                       WHEN t.tests_per_thousand < 200 THEN '1. менее 200 тестов на 1000'
+                       WHEN t.tests_per_thousand < 1000 THEN '2. 200–1000'
+                       WHEN t.tests_per_thousand < 3000 THEN '3. 1000–3000'
+                       ELSE '4. более 3000'
+                   END AS testing_tier,
+                   COUNT(*) AS countries,
+                   ROUND(100.0 * SUM(tot.total_deaths) / SUM(tot.total_cases), 2) AS cfr_pct,
+                   ROUND(AVG(l.median_age), 1) AS avg_median_age
+            FROM last_tests t
+            JOIN totals tot ON tot.iso_code = t.iso_code
+            JOIN locations l ON l.iso_code = t.iso_code
+            WHERE l.is_aggregate = 0 AND l.population >= 1000000
+            GROUP BY testing_tier
+            ORDER BY testing_tier;
+        """,
+    },
 }
 
 # SQL-запрос для сравнения Pandas vs SQL: недельные суммы по всем локациям прямо из дневной таблицы

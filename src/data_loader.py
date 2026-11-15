@@ -14,7 +14,11 @@ import urllib.request
 from pathlib import Path
 
 import pandas as pd
-import pyarrow  # noqa: F401  (импортируем заранее, чтобы время импорта не попало в замеры чтения)
+
+try:
+    import pyarrow  # noqa: F401  (импортируем заранее, чтобы время импорта не попало в замеры чтения)
+except ImportError as error:  # библиотеки нет — подсказываем, что делать
+    raise ImportError("Нет библиотеки pyarrow: выполните pip install -r requirements.txt") from error
 
 import config
 from src.utils import MemoryTimer, Timer, file_size_mb, log, memory_mb
