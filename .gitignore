@@ -12,3 +12,4 @@ data/raw/*.csv
 # большие производные файлы пересоздаются командой python main.py
 data/processed/*.parquet
 data/*.db
+.claude/

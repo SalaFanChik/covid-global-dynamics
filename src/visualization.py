@@ -68,6 +68,9 @@ def shade_waves(ax, waves, color, label):
         ax.axvline(pd.Timestamp(wave.peak_date), color=color, alpha=0.6, linewidth=1, linestyle="--")
 
 
+WAVES_XLIM = (pd.Timestamp("2020-01-01"), pd.Timestamp("2024-01-01"))   # после 2023 г. ряды почти нулевые
+
+
 def plot_waves_small_multiples(weekly, waves, locations, name="waves_small_multiples"):
     """Недельные случаи на миллион с закрашенными волнами для нескольких стран (2×2)."""
     fig, axes = plt.subplots(2, 2, figsize=(14, 8), sharex=True)
@@ -78,6 +81,7 @@ def plot_waves_small_multiples(weekly, waves, locations, name="waves_small_multi
         shade_waves(ax, country_waves, PALETTE[1], "волна (метод пиков)")
         ax.set_title(f"{location}: {len(country_waves)} волн")
         ax.set_ylabel("случаев на млн / нед.")
+        ax.set_xlim(WAVES_XLIM)
     axes[0, 0].legend(loc="upper left", fontsize=8)
     fig.suptitle("Волны заболеваемости COVID-19 (недельные случаи на миллион жителей)", fontsize=13)
     return save_figure(fig, name)
@@ -97,6 +101,7 @@ def plot_wave_methods(weekly, waves_threshold, waves_peaks, location, name="wave
                    label=f"порог {config.WAVE_THRESHOLD_PER_MILLION} на млн")
         ax.set_title(f"{location} — метод «{title}»: {len(country_waves)} волн")
         ax.set_ylabel("случаев на млн / нед.")
+        ax.set_xlim(WAVES_XLIM)
         ax.legend(loc="upper left", fontsize=8)
     return save_figure(fig, name)
 
