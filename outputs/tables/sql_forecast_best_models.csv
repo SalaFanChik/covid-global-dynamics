@@ -1,0 +1,23 @@
+location,horizon_weeks,model,mae,mae_vs_naive
+Brazil,1,naive,210.8,1.0
+Brazil,4,naive,589.17,1.0
+Germany,1,linear_regression,381.12,0.641
+Germany,4,naive,1856.95,1.0
+India,1,linear_regression,32.46,0.591
+India,4,naive,182.88,1.0
+Italy,1,linear_regression,492.31,0.755
+Italy,4,linear_regression,2062.06,0.975
+Japan,1,naive,445.44,1.0
+Japan,4,linear_regression,1343.55,0.936
+Kazakhstan,1,linear_regression,125.16,0.88
+Kazakhstan,4,naive,447.18,1.0
+Russia,1,linear_regression,145.52,0.68
+Russia,4,naive,721.6,1.0
+South Africa,1,linear_regression,102.91,0.99
+South Africa,4,naive,298.78,1.0
+United Kingdom,1,naive,539.52,1.0
+United Kingdom,4,naive,1490.73,1.0
+United States,1,linear_regression,348.36,0.89
+United States,4,naive,1242.47,1.0
+World,1,naive,146.29,1.0
+World,4,naive,394.23,1.0

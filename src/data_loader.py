@@ -24,10 +24,10 @@ RENAME_COLUMNS = {"country": "location", "code": "iso_code"}
 # Текстовые столбцы с небольшим числом уникальных значений -> тип category
 CATEGORY_COLUMNS = ["iso_code", "location", "continent"]
 
-# Столбцы с очень большими числами (до 10 млрд): оставляем float64,
-# потому что float32 хранит только ~7 значащих цифр и потерял бы точность
+# Столбцы с очень большими числами (до 10 млрд) и счётчики, которые мы суммируем,
+# оставляем float64: float32 хранит только ~7 значащих цифр и потерял бы точность
 KEEP_FLOAT64 = [
-    "population", "total_cases", "total_deaths",
+    "population", "new_cases", "new_deaths", "total_cases", "total_deaths",
     "total_vaccinations", "people_vaccinated", "people_fully_vaccinated",
     "total_boosters", "new_vaccinations", "total_tests", "new_tests",
     "excess_mortality_cumulative_absolute",

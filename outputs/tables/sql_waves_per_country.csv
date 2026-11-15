@@ -1,0 +1,226 @@
+location,continent,n_waves,strongest_peak_date,peak_weekly_cases_per_million,duration_weeks,cfr_pct,size
+Turks and Caicos Islands,North America,17,2022-01-10,15377.1,7,0.38,крупная
+Barbados,North America,16,2022-01-24,14679.4,14,0.24,крупная
+Liechtenstein,Europe,14,2022-03-07,28962.7,24,0.16,крупная
+Northern Mariana Islands,Oceania,14,2022-02-07,27331.3,20,0.28,крупная
+Saint Pierre and Miquelon,North America,12,2022-03-21,68344.9,8,0.0,крупная
+Saint Barthelemy,North America,12,2022-01-10,38454.5,9,0.0,крупная
+Martinique,North America,12,2022-01-17,34142.0,10,0.19,крупная
+Sint Maarten (Dutch part),North America,12,2022-01-10,29789.2,7,0.08,крупная
+Cyprus,Europe,12,2022-03-21,21597.0,24,0.12,крупная
+British Virgin Islands,North America,12,2022-01-03,18985.0,8,0.39,крупная
+Saint Martin (French part),North America,11,2022-01-10,53819.6,6,0.07,крупная
+Denmark,Europe,11,2022-01-31,52700.7,17,0.11,крупная
+Palau,Oceania,11,2022-01-31,49314.0,8,0.16,крупная
+Guam,Oceania,11,2022-01-31,27388.2,10,0.28,крупная
+Norway,Europe,11,2022-01-31,24907.7,19,0.12,крупная
+Monaco,Europe,11,2022-01-10,24005.1,14,0.24,крупная
+Malta,Europe,11,2021-12-27,11830.9,11,0.42,крупная
+Dominica,North America,11,2022-01-24,10187.4,16,0.37,крупная
+Niue,Oceania,10,2023-01-02,68510.5,9,0.0,крупная
+Iceland,Europe,10,2022-02-28,43691.9,17,0.04,крупная
+Slovenia,Europe,10,2022-01-24,41287.4,17,0.29,крупная
+Bonaire Sint Eustatius and Saba,North America,10,2022-01-17,31851.3,9,0.21,крупная
+Seychelles,Africa,10,2022-01-10,26593.3,9,0.17,крупная
+Switzerland,Europe,10,2022-01-24,26081.7,24,0.09,крупная
+Luxembourg,Europe,10,2022-01-17,25424.7,28,0.15,крупная
+Belgium,Europe,10,2022-01-24,25023.3,29,0.2,крупная
+Czechia,Europe,10,2022-01-31,23610.7,16,0.25,крупная
+Mauritius,Africa,10,2022-02-14,13345.8,15,0.16,крупная
+Saint Lucia,North America,10,2022-01-17,10744.2,9,0.67,крупная
+Moldova,Europe,10,2022-01-24,8700.8,10,0.81,крупная
+Guyana,South America,10,2022-01-10,6513.4,8,0.71,крупная
+Marshall Islands,Oceania,9,2022-08-15,122453.9,4,0.11,крупная
+Montserrat,North America,9,2022-05-09,49895.7,6,0.73,крупная
+Aruba,North America,9,2022-01-03,38744.4,7,0.1,крупная
+France,Europe,9,2022-01-17,33738.6,14,0.13,крупная
+Netherlands,Europe,9,2022-01-31,32069.1,23,0.06,крупная
+Lithuania,Europe,9,2022-01-31,28424.3,30,0.51,крупная
+New Zealand,Oceania,9,2022-03-07,25839.6,29,0.12,крупная
+French Polynesia,Oceania,9,2021-08-16,21064.9,8,1.77,крупная
+United Kingdom,Europe,9,2021-12-27,17278.6,43,0.24,крупная
+Croatia,Europe,9,2022-01-17,14608.7,31,1.0,крупная
+Anguilla,North America,9,2022-01-17,12838.6,16,0.44,крупная
+Romania,Europe,9,2022-01-31,9518.3,13,0.6,крупная
+Suriname,South America,9,2022-01-10,9001.8,8,0.47,крупная
+Bulgaria,Europe,9,2022-01-24,8547.2,16,1.66,крупная
+Sao Tome and Principe,Africa,9,2022-01-10,2817.6,5,0.56,средняя
+Falkland Islands,South America,8,2022-05-16,120531.1,6,0.0,крупная
+Brunei,Asia,8,2022-02-28,56447.4,9,0.03,крупная
+Cook Islands,Oceania,8,2022-03-28,53954.5,13,0.02,крупная
+Israel,Asia,8,2022-01-24,49502.3,15,0.09,крупная
+Andorra,Europe,8,2022-01-10,38822.4,27,0.09,крупная
+Guadeloupe,North America,8,2022-01-17,37714.0,33,0.11,крупная
+San Marino,Europe,8,2022-01-10,33672.4,27,0.2,крупная
+Guernsey,Europe,8,2022-03-21,33474.5,17,0.09,крупная
+Austria,Europe,8,2022-03-14,32026.8,19,0.1,крупная
+Estonia,Europe,8,2022-01-31,31371.4,16,0.18,крупная
+Gibraltar,Europe,8,2022-01-17,26875.0,29,0.03,крупная
+Ireland,Europe,8,2022-01-03,25205.9,26,0.16,крупная
+Isle of Man,Europe,8,2022-01-03,23862.7,22,0.19,крупная
+Slovakia,Europe,8,2022-02-07,21559.8,15,0.33,крупная
+United States Virgin Islands,North America,8,2022-01-03,21243.4,7,0.19,крупная
+Italy,Europe,8,2022-01-17,19792.7,26,0.26,крупная
+Puerto Rico,North America,8,2022-01-03,19750.1,8,0.25,крупная
+Australia,Oceania,8,2022-01-10,17799.6,10,0.14,крупная
+Bermuda,North America,8,2022-01-17,17296.6,10,0.3,крупная
+Serbia,Europe,8,2022-01-24,16324.7,14,0.47,крупная
+Mayotte,Africa,8,2022-01-10,15046.3,5,0.01,крупная
+Hungary,Europe,8,2022-01-31,10137.8,17,1.18,крупная
+Kosovo,Europe,8,2022-01-24,9872.6,6,0.17,крупная
+Cape Verde,Africa,8,2022-01-03,9603.3,6,0.25,крупная
+Russia,Europe,8,2022-02-07,8319.4,13,0.8,крупная
+Poland,Europe,8,2022-01-31,7655.4,23,1.29,крупная
+Costa Rica,North America,8,2022-01-31,7451.3,15,0.36,крупная
+Armenia,Asia,8,2022-01-31,6325.4,8,0.71,крупная
+North Macedonia,Europe,8,2022-01-17,6255.7,17,1.58,крупная
+Antigua and Barbuda,North America,8,2022-01-17,6153.3,9,0.56,крупная
+Saint Vincent and the Grenadines,North America,8,2022-01-10,5676.2,11,1.04,крупная
+Bahamas,North America,8,2022-01-10,5559.2,8,0.41,крупная
+Eswatini,Africa,8,2021-12-13,4652.5,7,0.51,средняя
+Azerbaijan,Asia,8,2022-02-07,3897.2,8,0.63,средняя
+Namibia,Africa,8,2021-06-28,3714.0,18,3.55,средняя
+Wallis and Futuna,Oceania,7,2022-10-03,76920.8,3,0.0,крупная
+Georgia,Asia,7,2022-01-31,35366.1,22,0.72,крупная
+Micronesia (country),Oceania,7,2022-10-03,34878.7,9,0.22,крупная
+Portugal,Europe,7,2022-01-24,34581.9,17,0.12,крупная
+Maldives,Asia,7,2022-01-24,29736.4,10,0.04,крупная
+French Guiana,South America,7,2022-01-10,26685.1,7,0.16,крупная
+Curacao,North America,7,2022-01-10,26251.2,8,0.32,крупная
+Sweden,Europe,7,2022-01-24,22860.6,9,0.17,крупная
+Singapore,Asia,7,2022-02-21,21435.6,15,0.05,крупная
+Greece,Europe,7,2022-01-03,18843.2,32,0.52,крупная
+Saint Kitts and Nevis,North America,7,2022-01-10,15599.6,7,0.34,крупная
+Panama,North America,7,2022-01-17,12739.0,9,0.24,крупная
+Japan,Asia,7,2022-08-08,11649.9,16,0.12,крупная
+Lebanon,Asia,7,2022-01-31,8889.4,18,0.38,крупная
+Peru,South America,7,2022-01-24,8150.3,8,0.62,крупная
+Malaysia,Asia,7,2022-02-28,5782.6,17,0.24,крупная
+Bolivia,South America,7,2022-01-10,5656.0,12,0.63,крупная
+Dominican Republic,North America,7,2022-01-10,3467.9,8,0.08,средняя
+Ecuador,South America,7,2022-01-24,2961.9,13,0.57,средняя
+Jamaica,North America,7,2022-01-10,2826.9,8,0.84,средняя
+Zimbabwe,Africa,7,2021-12-13,1353.0,8,0.62,средняя
+Reunion,Africa,6,2022-01-24,47344.8,22,0.11,крупная
+Latvia,Europe,6,2022-02-14,35334.5,15,0.27,крупная
+New Caledonia,Oceania,6,2022-02-14,31608.2,9,0.05,крупная
+Jersey,Europe,6,2022-01-03,27956.8,27,0.12,крупная
+Cayman Islands,North America,6,2022-02-07,22994.9,15,0.12,крупная
+Uruguay,South America,6,2022-01-24,21650.8,13,0.21,крупная
+Spain,Europe,6,2022-01-10,18792.2,16,0.23,крупная
+Germany,Europe,6,2022-03-14,18176.7,30,0.2,крупная
+Argentina,South America,6,2022-01-10,15754.9,9,0.3,крупная
+Mongolia,Asia,6,2021-09-27,14222.7,29,0.28,крупная
+Grenada,North America,6,2022-01-10,13943.1,8,0.18,крупная
+Belize,North America,6,2022-01-17,12154.2,10,0.24,крупная
+Chile,South America,6,2022-02-07,12131.7,13,1.05,крупная
+Finland,Europe,6,2021-12-27,10372.4,59,0.56,крупная
+Botswana,Africa,6,2022-02-14,6464.1,13,0.23,крупная
+Brazil,South America,6,2022-01-31,5600.9,15,0.54,крупная
+Ukraine,Europe,6,2022-01-31,5459.5,13,0.97,крупная
+Kazakhstan,Asia,6,2022-01-17,3870.6,7,0.2,средняя
+Iran,Asia,6,2021-08-16,2890.6,26,1.55,средняя
+South Africa,Africa,6,2021-12-13,2070.0,14,1.29,средняя
+Comoros,Africa,6,2021-12-27,1169.6,5,0.25,средняя
+El Salvador,North America,6,2022-02-21,1128.1,11,0.74,средняя
+Zambia,Africa,6,2021-12-27,1093.4,8,0.27,средняя
+Lesotho,Africa,6,2021-12-20,1004.0,8,0.27,средняя
+Honduras,North America,6,2021-08-09,946.7,51,2.72,малая
+Equatorial Guinea,Africa,6,2021-09-20,375.9,12,1.01,малая
+Faroe Islands,Europe,5,2022-01-31,90052.2,11,0.05,крупная
+South Korea,Asia,5,2022-03-14,47222.5,13,0.1,крупная
+Greenland,North America,5,2022-01-10,40876.7,8,0.07,крупная
+American Samoa,Oceania,5,2022-03-21,28264.2,9,0.45,крупная
+Tonga,Oceania,5,2022-03-21,16702.7,14,0.11,крупная
+Montenegro,Europe,5,2021-12-27,16676.7,12,0.56,крупная
+Bhutan,Asia,5,2022-04-04,11830.5,14,0.03,крупная
+Jordan,Asia,5,2022-02-07,10766.5,12,0.24,крупная
+Samoa,Oceania,5,2022-04-25,10168.6,14,0.19,крупная
+Kuwait,Asia,5,2022-01-24,8262.2,10,0.04,крупная
+Palestine,Asia,5,2022-01-31,8059.8,7,0.32,крупная
+Qatar,Asia,5,2022-01-17,7965.4,9,0.05,крупная
+Turkey,Asia,5,2022-02-07,7641.0,38,0.51,крупная
+Canada,North America,5,2022-01-03,6514.4,24,0.55,крупная
+Kiribati,Oceania,5,2022-01-31,6358.4,6,0.38,крупная
+Paraguay,South America,5,2022-01-24,5314.3,9,1.04,крупная
+Bosnia and Herzegovina,Europe,5,2022-01-17,4736.4,29,3.55,средняя
+Albania,Europe,5,2022-01-17,4604.0,11,0.48,средняя
+Tunisia,Africa,5,2022-01-17,4396.5,12,0.83,средняя
+Colombia,South America,5,2021-06-21,3882.4,25,2.44,средняя
+Trinidad and Tobago,North America,5,2021-12-06,3517.3,45,2.25,средняя
+Oman,Asia,5,2022-01-31,3046.7,10,0.17,средняя
+Mexico,North America,5,2022-01-17,2841.4,9,1.19,средняя
+Thailand,Asia,5,2022-03-28,2460.5,25,0.39,средняя
+United Arab Emirates,Asia,5,2021-01-25,2395.2,57,0.26,средняя
+Nepal,Asia,5,2021-05-10,1987.9,24,1.58,средняя
+Guatemala,North America,5,2022-07-18,1838.7,24,0.76,средняя
+Philippines,Asia,5,2022-01-17,1697.3,7,0.47,средняя
+Indonesia,Asia,5,2022-02-14,1222.9,9,0.61,средняя
+Saudi Arabia,Asia,5,2022-01-17,1078.4,9,0.06,средняя
+Mauritania,Africa,5,2022-01-10,1046.4,6,0.54,средняя
+Djibouti,Africa,5,2021-03-29,939.2,10,1.67,малая
+Gabon,Africa,5,2022-01-03,861.5,9,0.2,малая
+Bangladesh,Asia,5,2021-08-02,500.4,18,1.97,малая
+Kenya,Africa,5,2021-12-27,297.8,7,0.3,малая
+Pakistan,Asia,5,2022-01-24,184.4,10,0.62,малая
+Congo,Africa,5,2021-12-27,178.9,8,0.33,малая
+Guinea-Bissau,Africa,5,2021-08-09,161.5,12,2.73,малая
+Nauru,Oceania,4,2022-06-27,112361.1,5,0.02,крупная
+Tuvalu,Oceania,4,2022-11-14,84798.2,5,0.0,крупная
+Bahrain,Asia,4,2022-01-31,28491.8,13,0.03,крупная
+Vietnam,Asia,4,2022-03-07,15506.3,10,0.06,крупная
+United States,North America,4,2022-01-10,15007.5,17,0.61,крупная
+Fiji,Oceania,4,2021-07-19,7215.0,15,1.18,крупная
+Belarus,Europe,4,2022-02-14,5242.0,42,0.69,крупная
+Libya,Africa,4,2022-01-31,2931.1,16,0.73,средняя
+Laos,Asia,4,2022-03-28,1874.5,10,0.09,средняя
+India,Asia,4,2021-05-03,1806.2,20,1.32,средняя
+Iraq,Asia,4,2021-08-02,1703.7,40,0.71,средняя
+Morocco,Africa,4,2021-08-09,1632.0,13,1.25,средняя
+Sri Lanka,Asia,4,2021-08-23,1573.6,25,3.69,средняя
+Venezuela,South America,4,2022-01-24,475.5,11,0.46,малая
+Burundi,Africa,4,2021-12-27,321.8,7,0.0,малая
+Gambia,Africa,4,2020-08-10,265.6,10,0.0,малая
+Algeria,Africa,4,2022-01-24,235.4,14,1.45,малая
+Cameroon,Africa,4,2021-03-22,221.3,21,1.62,малая
+Ghana,Africa,4,2021-12-27,188.0,12,0.72,малая
+Uganda,Africa,4,2021-06-07,179.9,12,4.64,малая
+Ethiopia,Africa,4,2021-12-27,179.5,7,0.54,малая
+China,Asia,3,2022-12-19,17826.7,6,0.04,крупная
+Cuba,North America,3,2021-08-09,5701.0,31,0.89,крупная
+Solomon Islands,Oceania,3,2022-02-07,1975.9,12,1.14,средняя
+Kyrgyzstan,Asia,3,2021-07-05,1359.5,12,1.01,средняя
+East Timor,Asia,3,2021-08-23,1230.1,12,0.95,средняя
+Myanmar,Asia,3,2021-07-19,684.9,23,4.24,малая
+Rwanda,Africa,3,2021-07-19,562.4,18,1.32,малая
+Mozambique,Africa,3,2022-01-03,550.5,8,0.31,малая
+Togo,Africa,3,2022-01-03,324.7,6,0.23,малая
+Senegal,Africa,3,2021-07-19,314.3,11,2.07,малая
+Afghanistan,Asia,3,2021-06-14,287.5,16,4.76,малая
+Malawi,Africa,3,2021-12-27,248.0,8,1.11,малая
+Papua New Guinea,Oceania,3,2021-10-25,229.9,14,2.23,малая
+Angola,Africa,3,2021-12-27,214.3,8,0.48,малая
+Central African Republic,Africa,3,2021-04-19,183.3,10,0.68,малая
+Egypt,Africa,3,2022-02-07,136.1,32,3.48,малая
+Eritrea,Africa,3,2021-06-14,129.0,15,0.82,малая
+Madagascar,Africa,3,2021-04-12,111.4,15,2.58,малая
+Guinea,Africa,3,2022-01-03,106.1,6,0.54,малая
+Haiti,North America,3,2020-06-08,98.4,19,2.47,малая
+Vatican,Europe,2,2020-10-05,9096.8,3,0.0,крупная
+Tokelau,Oceania,2,2023-07-03,8794.7,6,0.0,крупная
+Vanuatu,Oceania,2,2022-03-28,4837.2,18,0.12,средняя
+Cambodia,Asia,2,2021-07-05,378.5,31,2.39,малая
+Uzbekistan,Asia,2,2022-01-24,224.3,10,0.44,малая
+Liberia,Africa,2,2021-06-21,146.1,8,5.43,малая
+South Sudan,Africa,2,2021-02-15,104.2,12,0.75,малая
+Nicaragua,North America,2,2021-09-20,76.3,33,0.41,малая
+Saint Helena,Africa,1,2022-09-26,115229.4,4,0.0,крупная
+Benin,Africa,1,2021-08-30,220.6,9,0.31,малая
+Mali,Africa,1,2022-01-03,120.1,13,1.06,малая
+Tanzania,Africa,1,2021-08-09,117.8,4,2.66,малая
+Tajikistan,Asia,1,2020-05-18,106.3,36,0.67,малая
+Syria,Asia,1,2021-10-11,96.8,21,4.05,малая
+Sudan,Africa,1,2022-01-17,60.9,16,4.13,малая
+Sierra Leone,Africa,1,2021-06-21,57.8,9,1.91,малая
+Somalia,Africa,1,2021-03-01,57.2,15,6.42,малая
+Democratic Republic of Congo,Africa,1,2021-12-20,57.0,8,0.64,малая
