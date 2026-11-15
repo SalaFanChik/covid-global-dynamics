@@ -1,3 +1,3 @@
 подход,строк,время_с_медиана
-SQL (SQLite GROUP BY + выгрузка в pandas),85555,0.402
-pandas (groupby в памяти),85555,0.016
+SQL (SQLite GROUP BY + выгрузка в pandas),85555,0.392
+pandas (groupby в памяти),85555,0.015

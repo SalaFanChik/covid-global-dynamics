@@ -340,7 +340,7 @@ def run_queries(connection, queries=QUERIES):
 def compare_pandas_vs_sql(df, connection, repeats=3):
     """
     Один и тот же расчёт двумя способами: недельные суммы случаев и смертей по всем локациям
-    из дневных данных (603 684 строки -> 86 407 недель).
+    из дневных данных (598 223 строки -> 85 555 недель).
 
     Что входит в замер: SQL — выполнение GROUP BY в SQLite и выгрузка результата в DataFrame;
     pandas — groupby по уже загруженному в память DataFrame. Берём медиану из repeats запусков

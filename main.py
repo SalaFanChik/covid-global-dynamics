@@ -11,6 +11,7 @@ COVID-19 Global Dynamics — главный файл проекта.
 """
 import argparse
 import platform
+import sqlite3
 import sys
 from datetime import datetime
 
@@ -123,6 +124,16 @@ def step_timeseries_and_waves():
     }).loc["2021-07-01":"2021-08-31"]
     save_table(rolling.reset_index(), "rolling_mean_kazakhstan")
 
+    # resample('W'): дневной ряд -> недельные суммы; сверяем с недельной таблицей (pd.Grouper даёт то же самое)
+    weekly_kz = timeseries.resample_series(daily_kz, "W-SUN")
+    from_table = timeseries.weekly_series(weekly, "Kazakhstan", "new_cases")
+    from_table.index = from_table.index + pd.Timedelta(days=6)        # понедельник -> воскресенье той же недели
+    resample_check = pd.DataFrame({"resample_W_SUN": weekly_kz, "grouper_W_SUN": from_table}).dropna()
+    resample_check["совпадает"] = (resample_check["resample_W_SUN"] - resample_check["grouper_W_SUN"]).abs() < 1e-6
+    resample_check.index.name = "week_end"
+    save_table(resample_check.reset_index(), "resample_check_kazakhstan")
+    log(f"  resample vs Grouper (Казахстан): совпадают {int(resample_check['совпадает'].sum())} из {len(resample_check)} недель")
+
     # сезонная декомпозиция 1: дневной ряд США с ежедневной отчётностью, период 7 дней —
     # эффект дня недели объясняет, почему базовая частота анализа — неделя
     daily_us = timeseries.country_series(df, "United States", "new_cases").loc["2020-03-01":"2022-12-31"]
@@ -190,7 +201,7 @@ def step_forecast():
 
 
 def step_database():
-    """Шаг 5. SQLite: схема, загрузка, 14 SQL-запросов, Pandas vs SQL, графики по результатам запросов."""
+    """Шаг 5. SQLite: схема, загрузка, 18 SQL-запросов из каталога, Pandas vs SQL, графики по результатам запросов."""
     log("ШАГ 5. База данных и SQL")
     df = get_clean_df()
     all_waves = pd.concat(get_waves().values(), ignore_index=True)
@@ -273,9 +284,11 @@ def run_all():
             try:
                 with Timer() as timer:
                     step()
-            except (FileNotFoundError, ConnectionError, ValueError) as error:
+            except (FileNotFoundError, ConnectionError, ValueError, sqlite3.Error) as error:
                 log(f"Шаг {number} «{name}» не выполнен: {error}")
-                sys.exit(1)
+                if isinstance(error, sqlite3.Error):
+                    log("  закройте программы, использующие data/covid.db (дашборд, DB Browser), и повторите шаг 5")
+                return None                      # из меню вернёмся к списку пунктов, а не закроем программу
             timings[f"{number}. {name}"] = timer.seconds
             log(f"--- шаг {number} выполнен за {timer.seconds} с ---")
     timings["всего"] = total.seconds
@@ -351,7 +364,7 @@ def run_menu():
                 log(f"«{title}» выполнено за {timer.seconds} с")
             except FileNotFoundError as error:
                 print(f"Нет нужного файла: {error}")
-            except (ConnectionError, ValueError) as error:
+            except (ConnectionError, ValueError, sqlite3.Error) as error:
                 print(f"Ошибка: {error}")
             except KeyboardInterrupt:
                 print("\nШаг прерван пользователем.")
@@ -362,12 +375,13 @@ def run_menu():
 def main():
     parser = argparse.ArgumentParser(description="COVID-19 Global Dynamics")
     parser.add_argument("--all", action="store_true", help="выполнить все шаги без меню")
-    parser.add_argument("--step", type=int, help="выполнить один шаг по номеру меню (1–6)")
+    parser.add_argument("--step", type=int, help="выполнить один пункт меню по номеру (1–8)")
     args = parser.parse_args()
 
     started = datetime.now()
     if args.all:
-        run_all()
+        if run_all() is None:            # шаг не выполнен — код возврата 1 для скриптов
+            sys.exit(1)
     elif args.step is not None:
         if str(args.step) not in MENU or MENU[str(args.step)][1] is None:
             print(f"Нет шага с номером {args.step}")

@@ -94,13 +94,20 @@ QUERIES = {
     },
     "rolling_average_kazakhstan": {
         "описание": "Скользящее среднее за 7 дней в SQL против готового столбца OWID (Казахстан, лето 2021)",
-        "конструкции": ["оконная функция AVG ... ROWS BETWEEN"],
+        "конструкции": ["CTE", "оконная функция AVG ... ROWS BETWEEN"],
         "sql": """
-            SELECT date, new_cases,
-                   ROUND(AVG(new_cases) OVER (ORDER BY date ROWS BETWEEN 6 PRECEDING AND CURRENT ROW), 2) AS rolling_7d_sql,
+            -- окно считается по всему ряду страны, а фильтр дат применяется снаружи:
+            -- иначе первые 6 строк периода усреднялись бы по неполному окну
+            WITH kaz AS (
+                SELECT date, new_cases, new_cases_smoothed,
+                       AVG(new_cases) OVER (ORDER BY date ROWS BETWEEN 6 PRECEDING AND CURRENT ROW) AS rolling_7d_sql
+                FROM daily_stats
+                WHERE iso_code = 'KAZ'
+            )
+            SELECT date, new_cases, ROUND(rolling_7d_sql, 2) AS rolling_7d_sql,
                    ROUND(new_cases_smoothed, 2) AS rolling_7d_owid
-            FROM daily_stats
-            WHERE iso_code = 'KAZ' AND date BETWEEN '2021-07-01' AND '2021-08-31'
+            FROM kaz
+            WHERE date BETWEEN '2021-07-01' AND '2021-08-31'
             ORDER BY date;
         """,
     },

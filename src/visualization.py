@@ -223,7 +223,7 @@ def plot_top_deaths(sql_table, name="top15_deaths_per_million"):
                if continent in set(table["continent"])]
     labels = [continent for continent in CONTINENT_COLORS if continent in set(table["continent"])]
     ax.legend(handles, labels, loc="lower right", fontsize=8, title="континент")
-    ax.set_xlabel("смертей на млн жителей (накопленно)")
+    ax.set_xlabel("смертей на млн жителей (накоплено)")
     ax.set_title("Топ-15 стран по смертности от COVID-19 на миллион жителей")
     return save_figure(fig, name)
 
@@ -237,7 +237,7 @@ def plot_cfr_by_wave_year(sql_table, name="cfr_by_wave_year"):
                 ha="center", fontsize=8)
     ax.set_ylabel("средняя летальность волны (CFR), %")
     ax.set_xlabel("год пика волны")
-    ax.set_title("Летальность волн снижалась от года к году (результат SQL-запроса cfr_by_wave_year)")
+    ax.set_title("Средняя летальность волн по году пика (результат SQL-запроса cfr_by_wave_year)")
     return save_figure(fig, name)
 
 

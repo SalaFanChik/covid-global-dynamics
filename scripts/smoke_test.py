@@ -12,13 +12,14 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import config  # noqa: E402
+from src.sql_queries import QUERIES  # noqa: E402
 
 EXPECTED_TABLES = ["format_comparison", "data_audit", "cleaning_log", "country_summary", "waves_peaks",
                    "waves_threshold", "wave_methods_comparison", "wave_sensitivity", "forecast_metrics",
                    "forecast_summary", "sql_queries_summary", "pandas_vs_sql", "correlation_matrix"]
 EXPECTED_FIGURES = ["waves_small_multiples.png", "wave_methods_comparison.png", "deaths_boxplot_by_continent.png",
                     "correlation_heatmap.png", "seasonal_decomposition_world.png", "seasonal_decomposition_us_daily.png",
-                    "forecast_comparison.png", "top15_deaths_per_million.png", "cfr_by_wave_year.png",
+                    "weekday_effect.png", "forecast_comparison.png", "top15_deaths_per_million.png", "cfr_by_wave_year.png",
                     "interactive_weekly_cases.html", "interactive_map_monthly_cases.html",
                     "interactive_vaccination_vs_deaths.html"]
 EXPECTED_DB_TABLES = {"continents", "locations", "daily_stats", "weekly_stats", "vaccinations",
@@ -36,7 +37,8 @@ def check_files():
     for name in EXPECTED_FIGURES:
         path = config.FIGURES_DIR / name
         assert path.exists() and path.stat().st_size > 0, f"нет графика {name}"
-    print(f"✓ файлы: {len(EXPECTED_TABLES)} таблиц и {len(EXPECTED_FIGURES)} графиков на месте")
+    assert (config.BASE_DIR / "docs" / "erd.png").exists(), "нет ER-диаграммы docs/erd.png"
+    print(f"✓ файлы: {len(EXPECTED_TABLES)} таблиц, {len(EXPECTED_FIGURES)} графиков и ER-диаграмма на месте")
 
 
 def check_database():
@@ -65,7 +67,7 @@ def check_results():
     share = results["3_ряды_и_волны"]["доля_случаев_в_волнах_макс"]
     assert share <= 1.001, f"волны пересекаются: доля случаев в волнах {share}"
     assert results["5_база_и_sql"]["проверка"]["результаты_совпадают"], "Pandas и SQL дали разные результаты"
-    assert results["5_база_и_sql"]["запросов_выполнено"] >= 8, "выполнено меньше 8 SQL-запросов"
+    assert results["5_база_и_sql"]["запросов_выполнено"] == len(QUERIES), f"выполнены не все {len(QUERIES)} SQL-запросов каталога"
     print(f"✓ результаты: {results['5_база_и_sql']['запросов_выполнено']} SQL-запросов, "
           f"доля случаев в волнах ≤ {share}, Pandas = SQL")
 

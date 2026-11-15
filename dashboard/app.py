@@ -7,8 +7,10 @@
 
 Запуск из корня проекта:  python dashboard/app.py   ->  http://127.0.0.1:8050
 """
+import socket
 import sqlite3
 import sys
+from contextlib import closing
 from pathlib import Path
 
 import pandas as pd
@@ -38,7 +40,7 @@ def query(sql, params=()):
     """Выполняет SQL-запрос к базе проекта и возвращает DataFrame."""
     if not config.DB_PATH.exists():
         raise FileNotFoundError(f"Нет базы {config.DB_PATH}: выполните «python main.py --all» или шаг 5 меню")
-    with sqlite3.connect(config.DB_PATH) as connection:
+    with closing(sqlite3.connect(config.DB_PATH)) as connection:     # closing закрывает соединение после запроса
         return pd.read_sql_query(sql, connection, params=params)
 
 
@@ -86,8 +88,10 @@ def waves_for(iso_code, year_from, year_to):
 
 def totals_by_country(metric, year_from, year_to, continent):
     """Сумма показателя по странам за период (для карты и топ-10)."""
+    if metric not in METRICS:              # имя столбца подставляется в текст SQL, поэтому только из белого списка
+        raise ValueError(f"неизвестный показатель {metric}")
     continent_filter = "" if continent == "Все" else "AND c.continent_name = ?"
-    params = [f"{year_from}-01-01", f"{year_to}-12-31"]
+    params = [config.MIN_POPULATION_FOR_STATS, f"{year_from}-01-01", f"{year_to}-12-31"]
     if continent != "Все":
         params.append(continent)
     return query(f"""
@@ -95,7 +99,7 @@ def totals_by_country(metric, year_from, year_to, continent):
         FROM weekly_stats w
         JOIN locations  l ON l.iso_code = w.iso_code
         JOIN continents c ON c.continent_id = l.continent_id
-        WHERE l.is_aggregate = 0 AND w.week_start BETWEEN ? AND ? {continent_filter}
+        WHERE l.is_aggregate = 0 AND l.population >= ? AND w.week_start BETWEEN ? AND ? {continent_filter}
         GROUP BY l.iso_code
         ORDER BY value DESC
     """, params)
@@ -157,7 +161,7 @@ def figure_top(table, metric, continent):
     fig = go.Figure(go.Bar(x=top["value"], y=top["location"], orientation="h",
                            marker_color=[CONTINENT_COLORS.get(c, "gray") for c in top["continent"]],
                            hovertemplate="%{y}: %{x:,.0f}<extra></extra>"))
-    fig.update_layout(title=f"Топ-10: {METRICS[metric]} ({continent})", template="plotly_white",
+    fig.update_layout(title=f"Топ-10: {METRICS[metric]} ({continent}, страны ≥ 1 млн)", template="plotly_white",
                       xaxis_title=METRICS[metric], margin={"l": 40, "r": 20, "t": 50, "b": 40})
     return fig
 
@@ -267,7 +271,7 @@ def build_app():
             waves = waves_for(iso_codes[0], year_from, year_to) if iso_codes else pd.DataFrame()
             totals = totals_by_country(metric, year_from, year_to, continent)
             vaccination_figure = figure_vaccination(continent)
-        except sqlite3.Error as error:                      # база повреждена или недоступна
+        except (sqlite3.Error, pd.errors.DatabaseError, ValueError) as error:   # база недоступна или ошибка в запросе
             message = empty_figure(f"Ошибка базы данных: {error}")
             return message, message, message, message, [], [], "Волны"
         first_country = countries[0] if countries else ""
@@ -287,13 +291,14 @@ def build_app():
 
 
 def run_dashboard(host=config.DASH_HOST, port=config.DASH_PORT, debug=False):
-    """Запускает сервер дашборда. Занятый порт — частая ошибка на демонстрации, поэтому сообщаем о ней понятно."""
+    """Запускает сервер дашборда. Занятый порт — частая ошибка на демонстрации, поэтому проверяем его заранее."""
+    with socket.socket() as probe:                 # Flask при занятом порте завершил бы программу своим сообщением
+        if probe.connect_ex((host, port)) == 0:
+            print(f"Порт {port} занят: остановите прошлый экземпляр дашборда или измените DASH_PORT в config.py")
+            return
     app = build_app()
     print(f"Дашборд запущен: http://{host}:{port}  (остановить — Ctrl+C)")
-    try:
-        app.run(host=host, port=port, debug=debug)
-    except OSError as error:
-        print(f"Порт {port} занят ({error}). Остановите прошлый экземпляр дашборда или измените DASH_PORT в config.py.")
+    app.run(host=host, port=port, debug=debug)
 
 
 if __name__ == "__main__":

@@ -99,6 +99,7 @@ def vaccination_vs_mortality(sql_vaccination_table):
                     "корреляция_спирмена": round(part["fully_vaccinated_pct"].corr(
                         part["deaths_per_million_2022"], method="spearman"), 3)}), include_groups=False)
                 .reset_index())
+    by_group["стран"] = by_group["стран"].astype(int)
     return table, overall, partial, by_group
 
 
