@@ -1,0 +1,5 @@
+# Для Google Colab: pandas, numpy, pyarrow, scipy, statsmodels, scikit-learn, matplotlib, seaborn, plotly и jupyter
+# там уже установлены (в других версиях). Доустанавливаем только Dash и Plotly той же версии, что в requirements.txt:
+# сам dash==4.5.0 требует лишь plotly>=5 и не обновил бы предустановленный plotly 5.x. Полный список версий — requirements.txt.
+dash==4.5.0
+plotly==7.1.0

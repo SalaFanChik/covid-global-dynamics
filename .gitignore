@@ -14,4 +14,3 @@ data/raw/*.csv
 data/processed/*.parquet
 !data/processed/covid_clean.parquet
 data/*.db
-.claude/
