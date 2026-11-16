@@ -1,7 +1,7 @@
 # Архитектура проекта «COVID-19 Global Dynamics»
 
 Тема 10, Cluster 2 «Exploratory Analytics, Time Series & Dashboards». Команда ADA-2602M (Astana IT University):
-Serikov Alikhan, Mashina Veronika. Документ описывает код таким, какой он лежит в репозитории; все числа взяты из
+Serikov Alikhan, Mashina Veronika, Mukhamejanova Dilnaz. Документ описывает код таким, какой он лежит в репозитории; все числа взяты из
 `outputs/results.json` и `outputs/tables/` последнего полного прогона (срез данных OWID до 2026-10-18,
 md5 `0af7a57f919d603b77986a0f3af7679c`). Инструкция по запуску и результаты — в [README.md](../README.md).
 
@@ -162,7 +162,8 @@ compact.csv (185 МБ, 629 868 строк)          scripts/download_data.py и�
 
 | Участник | Модули и материалы | Проверял(а) |
 |---|---|---|
-| Serikov Alikhan | `config.py`, `src/data_loader.py`, `src/cleaning.py`, `src/database.py` + `src/sql_queries.py` + `scripts/make_erd.py`, `src/waves.py`, `dashboard/app.py`, `main.py`, `README.md` | Mashina Veronika |
-| Mashina Veronika | `src/eda.py`, `src/timeseries.py`, `src/correlation.py`, `src/forecasting.py`, `src/visualization.py`, ноутбук, письменный отчёт, презентация | Serikov Alikhan |
+| Serikov Alikhan | `config.py`, `main.py`, `src/data_loader.py`, `src/cleaning.py`, `src/database.py` + `src/sql_queries.py` + `scripts/make_erd.py`, `src/waves.py`, `README.md` | Mashina Veronika |
+| Mashina Veronika | `src/eda.py`, `src/timeseries.py`, `src/correlation.py`, `src/visualization.py`, письменный отчёт | Mukhamejanova Dilnaz |
+| Mukhamejanova Dilnaz | `src/forecasting.py`, `dashboard/app.py`, `scripts/smoke_test.py`, ноутбук, презентация | Serikov Alikhan |
 
 Это рабочее разделение; каждый участник отвечает на вопросы по любой части кода.

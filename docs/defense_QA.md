@@ -2,7 +2,7 @@
 
 Дисциплина: Programming for Data Analysis and Database. Программа Applied Data Analytics (магистратура), Astana IT University, группа ADA-2602M.
 Тема 10 (Cluster 2): волны, вакцинация и смертность по странам по данным Our World in Data.
-Команда: Serikov Alikhan, Mashina Veronika. Репозиторий: https://github.com/SalaFanChik/covid-global-dynamics
+Команда: Serikov Alikhan, Mashina Veronika, Mukhamejanova Dilnaz. Репозиторий: https://github.com/SalaFanChik/covid-global-dynamics
 
 Документ составлен 15.11.2026 по полному прогону `python main.py --all` (раздел «время_шагов_с» в outputs/results.json, файл данных md5 `0af7a57f919d603b77986a0f3af7679c`). Все числа взяты из `outputs/results.json` и таблиц `outputs/tables/*.csv`; если число посчитано дополнительно, указано, из какого файла. Результаты анализа (строки, волны, MAE, корреляции) при повторных прогонах на том же файле не меняются; времена выполнения отличаются на сотые доли секунды (например, чтение CSV 0,36 с в одном прогоне и 0,32 с в другом), поэтому на защите называть порядок величины, а не третий знак.
 
@@ -13,18 +13,19 @@
 | Модуль / файл | Автор | Ревьюер | Раздел вопросов ниже |
 |---|---|---|---|
 | config.py | Serikov Alikhan | Mashina Veronika | 3 |
+| main.py, README.md | Serikov Alikhan | Mashina Veronika | 2.10, 2.11 |
 | src/data_loader.py | Serikov Alikhan | Mashina Veronika | 2.1 |
 | src/cleaning.py | Serikov Alikhan | Mashina Veronika | 2.2 |
 | src/database.py, src/sql_queries.py, scripts/make_erd.py | Serikov Alikhan | Mashina Veronika | 2.7 |
 | src/waves.py | Serikov Alikhan | Mashina Veronika | 2.5 |
-| dashboard/app.py | Serikov Alikhan | Mashina Veronika | 2.8 |
-| main.py, README.md | Serikov Alikhan | Mashina Veronika | 2.10, 2.11 |
-| src/eda.py | Mashina Veronika | Serikov Alikhan | 2.4 |
-| src/timeseries.py | Mashina Veronika | Serikov Alikhan | 2.3 |
-| src/correlation.py | Mashina Veronika | Serikov Alikhan | 2.9 |
-| src/forecasting.py | Mashina Veronika | Serikov Alikhan | 2.6 |
-| src/visualization.py | Mashina Veronika | Serikov Alikhan | 2.12 |
-| ноутбук (notebooks/), письменный отчёт, презентация | Mashina Veronika | Serikov Alikhan | — |
+| src/eda.py | Mashina Veronika | Mukhamejanova Dilnaz | 2.4 |
+| src/timeseries.py | Mashina Veronika | Mukhamejanova Dilnaz | 2.3 |
+| src/correlation.py | Mashina Veronika | Mukhamejanova Dilnaz | 2.9 |
+| src/visualization.py | Mashina Veronika | Mukhamejanova Dilnaz | 2.12 |
+| письменный отчёт | Mashina Veronika | Mukhamejanova Dilnaz | — |
+| src/forecasting.py | Mukhamejanova Dilnaz | Serikov Alikhan | 2.6 |
+| dashboard/app.py | Mukhamejanova Dilnaz | Serikov Alikhan | 2.8 |
+| scripts/smoke_test.py, ноутбук (notebooks/), презентация | Mukhamejanova Dilnaz | Serikov Alikhan | — |
 
 Это рабочее разделение внутри команды. Каждый участник отвечает на вопросы по любой части кода: ревьюер читал и запускал модули второго участника. На репетиции каждый отвечает на 10 случайных вопросов из разделов, которые писал не он.
 
@@ -415,7 +416,7 @@ scripts/smoke_test.py без pytest, обычные `assert`: `check_files` — 
 - [ ] Сверить числа в отчёте, презентации и README с outputs/results.json и outputs/tables после последнего прогона `python main.py --all`. Не цитировать docs/architecture.md — это ранний черновик с устаревшими числами.
 
 За 3–2 дня
-- [ ] Загрузить в LMS Moodle письменный отчёт и презентацию (.pptx или .pdf) — «за 2–3 дня до итогового экзамена». В обоих файлах: фамилии Serikov Alikhan и Mashina Veronika, группа ADA-2602M, ссылка на GitHub, таблица вклада участников.
+- [ ] Загрузить в LMS Moodle письменный отчёт и презентацию (.pptx или .pdf) — «за 2–3 дня до итогового экзамена». В обоих файлах: фамилии Serikov Alikhan, Mashina Veronika и Mukhamejanova Dilnaz, группа ADA-2602M, ссылка на GitHub, таблица вклада участников.
 - [ ] Две репетиции с таймером: демонстрация 3 минуты (раздел 1.2) + презентация. Каждый участник отвечает на 10 случайных вопросов из разделов, которые писал не он (таблица в начале документа).
 - [ ] Выучить опорные числа: 629 868 строк → 598 223 после очистки; 326 → 185 МБ (−43,4 %); Parquet 22,7 МБ и 0,019 с; 1 429 волн методом пиков, 816 порогом; 100 % и 73,7 % эталонных пиков; MAE регрессии 301,9 против naive 339,8 на неделю, naive лучший на 4 недели; 18 SQL-запросов, 10 таблиц, база 91,9 МБ; pandas 0,016 с против SQL 0,402 с; корреляция вакцинации и смертности +0,663 → −0,248 при контроле возраста.
 

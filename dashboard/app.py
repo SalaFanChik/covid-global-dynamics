@@ -200,7 +200,7 @@ def build_app():
     app.layout = html.Div(style={"fontFamily": "Arial, sans-serif", "margin": "0 24px"}, children=[
         html.H2("COVID-19 Global Dynamics — волны, вакцинация и смертность"),
         html.P("Источник: Our World in Data (compact dataset), 2020-01-01 — 2026-10-18. "
-               "Данные читаются из SQLite SQL-запросами. Проект ADA-2602M: Serikov Alikhan, Mashina Veronika.",
+               "Данные читаются из SQLite SQL-запросами. Проект ADA-2602M: Serikov Alikhan, Mashina Veronika, Mukhamejanova Dilnaz.",
                style={"color": "#52514e"}),
 
         html.Div(style={"display": "flex", "gap": "24px", "flexWrap": "wrap", "alignItems": "flex-end"}, children=[

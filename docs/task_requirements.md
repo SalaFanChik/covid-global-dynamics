@@ -3,7 +3,7 @@
 Дисциплина: Programming for Data Analysis and Database. В документе преподавателя программа названа «Big Data Analysis (магистратура)»; фактическая образовательная программа команды — 7M06103 Applied Data Analytics (магистратура), так она и указана во всех материалах проекта.
 Тема № 10: **COVID-19 Global Dynamics** — Analyze waves, vaccination, and mortality across countries.
 Датасет: Our World in Data — https://github.com/owid/covid-19-data. Инструменты: Pandas, Plotly, Dash.
-Фокус: Wave detection + interactive dashboard. Команда: ADA-2602M — Serikov Alikhan, Mashina Veronika.
+Фокус: Wave detection + interactive dashboard. Команда: ADA-2602M — Serikov Alikhan, Mashina Veronika, Mukhamejanova Dilnaz.
 
 ## I. Общие требования
 - Тема утверждается преподавателем. Команда 2–3 человека: вклад каждого указывается в отчёте и презентации.

@@ -8,7 +8,7 @@
 
 **Тема 10 «COVID-19 Global Dynamics»** · Cluster 2 «Exploratory Analytics, Time Series & Dashboards» ·
 дисциплина «Programming for Data Analysis and Database» · Astana IT University, ОП Applied Data Analytics (магистратура),
-группа ADA-2602M · команда: **Serikov Alikhan, Mashina Veronika**.
+группа ADA-2602M · команда: **Serikov Alikhan, Mashina Veronika, Mukhamejanova Dilnaz**.
 
 Код: https://github.com/SalaFanChik/covid-global-dynamics. Письменный отчёт (`docs/report/`) и презентация
 (`docs/presentation/`) загружаются также в Moodle за 2–3 дня до итогового экзамена.
@@ -479,8 +479,9 @@ MAE — средний по 11 рядам, «к naive» — среднее от�
 
 | Участник | Модули и материалы | Проверял(а) |
 |---|---|---|
-| Serikov Alikhan | `config.py`, `src/data_loader.py`, `src/cleaning.py`, `src/database.py` + `src/sql_queries.py` + `scripts/make_erd.py`, `src/waves.py`, `dashboard/app.py`, `main.py`, `README.md` | Mashina Veronika |
-| Mashina Veronika | `src/eda.py`, `src/timeseries.py`, `src/correlation.py`, `src/forecasting.py`, `src/visualization.py`, ноутбук, письменный отчёт, презентация | Serikov Alikhan |
+| Serikov Alikhan | `config.py`, `main.py`, `src/data_loader.py`, `src/cleaning.py`, `src/database.py` + `src/sql_queries.py` + `scripts/make_erd.py`, `src/waves.py`, `README.md` | Mashina Veronika |
+| Mashina Veronika | `src/eda.py`, `src/timeseries.py`, `src/correlation.py`, `src/visualization.py`, письменный отчёт | Mukhamejanova Dilnaz |
+| Mukhamejanova Dilnaz | `src/forecasting.py`, `dashboard/app.py`, `scripts/smoke_test.py`, ноутбук, презентация | Serikov Alikhan |
 
 Это рабочее разделение: каждый модуль писал один участник и проверял другой, и каждый участник отвечает на вопросы
 по любой части кода.
